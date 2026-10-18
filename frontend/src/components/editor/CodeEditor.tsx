@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import {
-  Play, Send, Lightbulb, RotateCcw, CheckCircle2,
-  XCircle, Clock, Cpu, AlertTriangle, Terminal, Code2
+  CheckCircle2,
+  Clock3,
+  Code2,
+  Cpu,
+  Lightbulb,
+  Play,
+  RotateCcw,
+  Send,
+  Terminal,
+  XCircle,
 } from 'lucide-react';
 import { Challenge, SubmissionResult } from '../../types';
 
@@ -16,6 +24,8 @@ interface CodeEditorProps {
   onResetCode: () => void;
 }
 
+type EditorTab = 'editor' | 'testcases' | 'output';
+
 export const CodeEditor: React.FC<CodeEditorProps> = ({
   challenge,
   code,
@@ -24,289 +34,303 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   onSubmit,
   isEvaluating,
   submissionResult,
-  onResetCode
+  onResetCode,
 }) => {
-  const [activeTab, setActiveTab] = useState<'editor' | 'testcases' | 'output'>('editor');
+  const [activeTab, setActiveTab] = useState<EditorTab>('editor');
   const [showHint, setShowHint] = useState(false);
 
-  const getLanguageLabel = (lang: string) => {
-    switch (lang.toLowerCase()) {
-      case 'verilog': return 'Verilog HDL (IEEE 1364)';
-      case 'c': return 'Embedded C (C99 / GCC)';
+  const getLanguageLabel = (language: string) => {
+    switch (language.toLowerCase()) {
+      case 'verilog': return 'Verilog HDL · IEEE 1364';
+      case 'c': return 'Embedded C · C99 / GCC';
       case 'python': return 'Python 3.11';
-      default: return lang.toUpperCase();
+      default: return language.toUpperCase();
     }
   };
 
+  const tabs: { id: EditorTab; label: string }[] = [
+    { id: 'editor', label: 'Code' },
+    { id: 'testcases', label: `Test cases (${challenge.test_cases.length})` },
+  ];
+
   return (
-    <div className="flex flex-col h-full bg-[#111827] border border-[#223147] rounded-xl overflow-hidden shadow-2xl">
-      {/* Editor Header Bar */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#161F2E] border-b border-[#223147]">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <Code2 className="w-4 h-4 text-[#0066FF]" />
-            <span className="text-xs font-mono font-medium text-slate-300">
-              {getLanguageLabel(challenge.language)}
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-teal-100 bg-white" aria-busy={isEvaluating}>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-teal-200 bg-teal-50 text-enginx-primary">
+              <Code2 className="h-4 w-4" aria-hidden="true" />
             </span>
+            <span className="truncate text-xs font-semibold text-slate-700">{getLanguageLabel(challenge.language)}</span>
           </div>
 
-          <div className="h-4 w-px bg-slate-700 hidden sm:block" />
-
-          {/* Quick Tabs for Mobile / Split View */}
-          <div className="flex space-x-1">
-            <button
-              onClick={() => setActiveTab('editor')}
-              className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
-                activeTab === 'editor'
-                  ? 'bg-[#0066FF]/20 text-[#0066FF] border border-[#0066FF]/40'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Code
-            </button>
-            <button
-              onClick={() => setActiveTab('testcases')}
-              className={`px-2.5 py-1 text-xs rounded font-medium transition-colors ${
-                activeTab === 'testcases'
-                  ? 'bg-[#0066FF]/20 text-[#0066FF] border border-[#0066FF]/40'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Test Cases ({challenge.test_cases.length})
-            </button>
+          <div className="flex items-center gap-1 overflow-x-auto" role="tablist" aria-label="Editor views">
+            {tabs.map(({ id, label }) => {
+              const isActive = activeTab === id;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(id)}
+                  className={`focus-ring min-h-[44px] shrink-0 rounded-lg border px-3 text-xs font-semibold transition-colors ${
+                    isActive
+                      ? 'border-teal-200 bg-teal-50 text-enginx-primary'
+                      : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-800'
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
             {submissionResult && (
               <button
+                type="button"
+                role="tab"
+                aria-selected={activeTab === 'output'}
                 onClick={() => setActiveTab('output')}
-                className={`px-2.5 py-1 text-xs rounded font-medium transition-colors flex items-center space-x-1 ${
+                className={`focus-ring flex min-h-[40px] shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-semibold transition-colors ${
                   activeTab === 'output'
-                    ? 'bg-[#2ECC71]/20 text-[#2ECC71] border border-[#2ECC71]/40'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                    : 'border-transparent text-slate-500 hover:border-slate-200 hover:bg-white hover:text-slate-800'
                 }`}
               >
                 <span>Result</span>
-                <span className={`w-2 h-2 rounded-full ${submissionResult.verdict === 'AC' ? 'bg-[#2ECC71]' : 'bg-rose-500'}`} />
+                <span className={`h-2 w-2 rounded-full ${submissionResult.verdict === 'AC' ? 'bg-emerald-600' : 'bg-rose-600'}`} aria-hidden="true" />
               </button>
             )}
           </div>
         </div>
 
-        {/* Top Controls */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           {challenge.solution_hints.length > 0 && (
             <button
-              onClick={() => setShowHint(!showHint)}
-              className="flex items-center space-x-1 px-2.5 py-1 rounded text-xs font-medium text-amber-400 hover:bg-amber-400/10 border border-amber-400/20 transition-colors"
-              title="Show Hint"
+              type="button"
+              onClick={() => setShowHint((visible) => !visible)}
+              aria-pressed={showHint}
+              className="focus-ring flex min-h-[44px] items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+              title="Show hint"
             >
-              <Lightbulb className="w-3.5 h-3.5" />
+              <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="hidden sm:inline">Hint</span>
             </button>
           )}
-
           <button
+            type="button"
             onClick={onResetCode}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className="focus-ring flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-800"
             title="Reset to starter template"
+            aria-label="Reset to starter template"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      {/* Optional Hint Banner */}
       {showHint && challenge.solution_hints.length > 0 && (
-        <div className="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/30 flex items-start space-x-2 text-xs text-amber-200">
-          <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-          <div>
-            <span className="font-semibold text-amber-300">Engineering Hint: </span>
+        <div className="flex items-start gap-2 border-b border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900" role="status">
+          <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-enginx-cta" aria-hidden="true" />
+          <p>
+            <span className="font-bold">Engineering hint: </span>
             {challenge.solution_hints[0]}
-          </div>
+          </p>
         </div>
       )}
 
-      {/* Editor Body */}
-      <div className="flex-1 relative flex flex-col overflow-hidden">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
         {activeTab === 'editor' && (
-          <div className="flex-1 flex overflow-hidden">
-            {/* Line Numbers Simulation */}
-            <div className="w-10 py-3 bg-[#0B0F17]/60 border-r border-[#223147] select-none text-right pr-2 text-xs font-mono text-slate-600">
-              {code.split('\n').map((_, i) => (
-                <div key={i} className="leading-6">{i + 1}</div>
+          <div className="flex min-h-0 flex-1 overflow-hidden bg-slate-50">
+            <div className="w-11 shrink-0 select-none overflow-hidden border-r border-slate-200 bg-slate-100 py-4 pr-2 text-right font-mono text-xs leading-6 text-slate-400" aria-hidden="true">
+              {code.split('\n').map((_, index) => (
+                <div key={index}>{index + 1}</div>
               ))}
             </div>
-
-            {/* Editable Code Textarea */}
-            <textarea
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              spellCheck={false}
-              autoCapitalize="off"
-              autoComplete="off"
-              className="flex-1 p-3 bg-[#0B0F17] text-slate-100 font-mono text-sm leading-6 resize-none focus:outline-none focus:ring-0 selection:bg-[#0066FF]/40 border-none overflow-y-auto"
-            />
+            <label className="flex min-h-0 flex-1">
+              <span className="sr-only">Code editor for {challenge.title}</span>
+              <textarea
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                spellCheck={false}
+                autoCapitalize="off"
+                autoComplete="off"
+                aria-label={`Code editor for ${challenge.title}`}
+                className="min-h-0 w-full resize-none border-0 bg-slate-50 p-4 font-mono text-sm leading-6 text-slate-900 caret-teal-700 selection:bg-teal-200 focus:outline-none"
+              />
+            </label>
           </div>
         )}
 
         {activeTab === 'testcases' && (
-          <div className="flex-1 p-4 overflow-y-auto bg-[#0B0F17] space-y-3">
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-              Verification Test Suite
-            </h4>
-            {challenge.test_cases.map((tc, idx) => (
-              <div key={idx} className="p-3 rounded-lg bg-[#161F2E] border border-[#223147] text-xs font-mono">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-slate-300 font-semibold">Test Case #{idx + 1}</span>
-                  {tc.hidden ? (
-                    <span className="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px]">Hidden Evaluation</span>
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4">
+            <div>
+              <p className="eyebrow">Verification suite</p>
+              <h3 className="mt-1 text-sm font-bold text-slate-900">Public and hidden test cases</h3>
+            </div>
+            {challenge.test_cases.map((testCase, index) => (
+              <article key={testCase.id || index} className="rounded-xl border border-slate-200 bg-white p-3 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-slate-800">Test case #{index + 1}</span>
+                  {testCase.hidden ? (
+                    <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-500">Hidden evaluation</span>
                   ) : (
-                    <span className="px-1.5 py-0.5 rounded bg-[#0066FF]/10 text-[#0066FF] text-[10px]">Public</span>
+                    <span className="rounded-full bg-teal-50 px-2 py-1 text-[10px] font-semibold text-teal-800">Public</span>
                   )}
                 </div>
-                {!tc.hidden ? (
-                  <div className="grid grid-cols-2 gap-2 text-slate-300">
-                    <div>
-                      <span className="text-slate-500">Input: </span>
-                      <pre className="text-amber-300 mt-0.5 overflow-x-auto">{JSON.stringify(tc.input)}</pre>
+                {!testCase.hidden ? (
+                  <div className="mt-3 grid gap-3 text-slate-600 sm:grid-cols-2">
+                    <div className="min-w-0">
+                      <span className="font-semibold text-slate-500">Input</span>
+                      <pre className="mt-1 overflow-x-auto font-mono text-xs text-slate-800">{JSON.stringify(testCase.input)}</pre>
                     </div>
-                    <div>
-                      <span className="text-slate-500">Expected: </span>
-                      <pre className="text-[#2ECC71] mt-0.5 overflow-x-auto">{JSON.stringify(tc.expected)}</pre>
+                    <div className="min-w-0">
+                      <span className="font-semibold text-slate-500">Expected</span>
+                      <pre className="mt-1 overflow-x-auto font-mono text-xs text-teal-800">{JSON.stringify(testCase.expected)}</pre>
                     </div>
                   </div>
                 ) : (
-                  <p className="text-slate-500 italic">Evaluated during final submission verification.</p>
+                  <p className="mt-3 text-slate-500">Evaluated during final submission verification.</p>
                 )}
-              </div>
+              </article>
             ))}
           </div>
         )}
 
-        {activeTab === 'output' && submissionResult && (
-          <div className="flex-1 p-4 overflow-y-auto bg-[#0B0F17] space-y-4">
-            {/* Verdict Card */}
-            <div className={`p-4 rounded-xl border flex items-center justify-between ${
-              submissionResult.verdict === 'AC'
-                ? 'bg-[#2ECC71]/10 border-[#2ECC71]/40 text-[#2ECC71]'
-                : 'bg-rose-500/10 border-rose-500/40 text-rose-400'
-            }`}>
-              <div className="flex items-center space-x-3">
-                {submissionResult.verdict === 'AC' ? (
-                  <CheckCircle2 className="w-8 h-8 text-[#2ECC71] fill-[#2ECC71]/20" />
-                ) : (
-                  <XCircle className="w-8 h-8 text-rose-500 fill-rose-500/20" />
-                )}
-                <div>
-                  <h3 className="font-bold text-lg font-mono">
-                    {submissionResult.verdict === 'AC' ? 'ACCEPTED (AC)' : `VERDICT: ${submissionResult.verdict}`}
-                  </h3>
-                  <p className="text-xs opacity-90">
-                    {submissionResult.verdict === 'AC'
-                      ? `Challenge completed! +${submissionResult.xp_awarded} XP earned.`
-                      : 'Logic test failed. Check test case outputs below.'}
-                  </p>
-                </div>
+        {activeTab === 'output' && (
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4">
+            {!submissionResult && isEvaluating && (
+              <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-dashed border-teal-200 bg-white text-center">
+                <span className="h-7 w-7 animate-spin rounded-full border-2 border-teal-200 border-t-teal-600" aria-hidden="true" />
+                <p className="mt-3 text-sm font-semibold text-slate-800">Evaluating your solution…</p>
+                <p className="mt-1 text-xs text-slate-500">Running the verification suite.</p>
               </div>
+            )}
 
-              <div className="text-right text-xs font-mono text-slate-400 space-y-0.5">
-                <div className="flex items-center space-x-1 justify-end">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{submissionResult.execution_time_ms} ms</span>
-                </div>
-                <div className="flex items-center space-x-1 justify-end">
-                  <Cpu className="w-3.5 h-3.5" />
-                  <span>{submissionResult.memory_used_kb} KB</span>
-                </div>
-              </div>
-            </div>
+            {submissionResult && (
+              <>
+                <div className={`flex flex-col gap-4 rounded-xl border p-4 sm:flex-row sm:items-center sm:justify-between ${
+                  submissionResult.verdict === 'AC'
+                    ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                    : 'border-rose-200 bg-rose-50 text-rose-900'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    {submissionResult.verdict === 'AC' ? (
+                      <CheckCircle2 className="h-8 w-8 shrink-0 text-emerald-600" aria-hidden="true" />
+                    ) : (
+                      <XCircle className="h-8 w-8 shrink-0 text-rose-600" aria-hidden="true" />
+                    )}
+                    <div>
+                      <h3 className="text-lg font-bold">
+                        {submissionResult.verdict === 'AC' ? 'Accepted' : `Verdict: ${submissionResult.verdict}`}
+                      </h3>
+                      <p className="mt-0.5 text-xs opacity-80">
+                        {submissionResult.verdict === 'AC'
+                          ? `Challenge completed! +${submissionResult.xp_awarded} XP earned.`
+                          : 'Logic test failed. Review the test case outputs below.'}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Test Results Breakdown */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Execution Breakdown ({submissionResult.test_results.filter(t => t.passed).length}/{submissionResult.test_results.length} Passed)
-              </h4>
-              {submissionResult.test_results.map((tr, idx) => (
-                <div
-                  key={idx}
-                  className={`p-3 rounded-lg border text-xs font-mono ${
-                    tr.passed
-                      ? 'bg-[#161F2E] border-[#2ECC71]/30 text-slate-300'
-                      : 'bg-rose-950/20 border-rose-500/30 text-rose-200'
-                  }`}
-                >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-bold">Test Case #{tr.test_case_id}</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      tr.passed ? 'bg-[#2ECC71]/20 text-[#2ECC71]' : 'bg-rose-500/20 text-rose-400'
-                    }`}>
-                      {tr.passed ? 'PASSED' : 'FAILED'}
+                  <div className="flex gap-4 text-xs font-mono text-slate-600 sm:flex-col sm:items-end sm:gap-1">
+                    <span className="flex items-center gap-1">
+                      <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+                      {submissionResult.execution_time_ms} ms
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Cpu className="h-3.5 w-3.5" aria-hidden="true" />
+                      {submissionResult.memory_used_kb} KB
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    <div>
-                      <span className="text-slate-500">Expected:</span>
-                      <pre className="text-[#2ECC71] mt-0.5 overflow-x-auto">{JSON.stringify(tr.expected)}</pre>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Actual:</span>
-                      <pre className={tr.passed ? "text-[#2ECC71] mt-0.5 overflow-x-auto" : "text-rose-400 mt-0.5 overflow-x-auto"}>
-                        {JSON.stringify(tr.actual)}
-                      </pre>
-                    </div>
-                  </div>
-                  {tr.message && (
-                    <p className="mt-2 text-xs text-rose-400 bg-rose-950/40 p-1.5 rounded">{tr.message}</p>
-                  )}
                 </div>
-              ))}
-            </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="eyebrow">Execution breakdown</p>
+                    <span className="text-xs font-semibold text-slate-500">
+                      {submissionResult.test_results.filter((test) => test.passed).length}/{submissionResult.test_results.length} passed
+                    </span>
+                  </div>
+                  {submissionResult.test_results.map((testResult, index) => (
+                    <article
+                      key={`${testResult.test_case_id}-${index}`}
+                      className={`rounded-xl border bg-white p-3 text-xs ${
+                        testResult.passed ? 'border-emerald-200' : 'border-rose-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-slate-800">Test case #{testResult.test_case_id}</span>
+                        <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
+                          testResult.passed ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                        }`}>
+                          {testResult.passed ? 'Passed' : 'Failed'}
+                        </span>
+                      </div>
+                      <div className="mt-3 grid gap-3 font-mono sm:grid-cols-2">
+                        <div className="min-w-0">
+                          <span className="font-sans text-slate-500">Expected</span>
+                          <pre className="mt-1 overflow-x-auto text-teal-800">{JSON.stringify(testResult.expected)}</pre>
+                        </div>
+                        <div className="min-w-0">
+                          <span className="font-sans text-slate-500">Actual</span>
+                          <pre className={`mt-1 overflow-x-auto ${testResult.passed ? 'text-teal-800' : 'text-rose-700'}`}>
+                            {JSON.stringify(testResult.actual)}
+                          </pre>
+                        </div>
+                      </div>
+                      {testResult.message && (
+                        <p className="mt-3 rounded-lg bg-rose-50 p-2 text-rose-700">{testResult.message}</p>
+                      )}
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      {/* Editor Footer / Action Buttons */}
-      <div className="px-4 py-3 bg-[#161F2E] border-t border-[#223147] flex items-center justify-between">
-        <div className="text-xs text-slate-400 flex items-center space-x-2">
-          <Terminal className="w-3.5 h-3.5 text-slate-500" />
-          <span>Fira Code • UTF-8</span>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3">
+        <div className="flex items-center gap-2 text-xs text-slate-500">
+          <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
+          <span>UTF-8 · local simulator ready</span>
         </div>
 
-        <div className="flex items-center space-x-3">
-          {/* Run Button */}
+        <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => {
               setActiveTab('output');
               onRun();
             }}
             disabled={isEvaluating}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 hover:border-slate-600 transition-all disabled:opacity-50"
+            className="focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border border-teal-200 bg-white px-4 text-xs font-bold text-teal-800 transition-colors hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <Play className="w-3.5 h-3.5 text-slate-300 fill-slate-300" />
-            <span>Run Code</span>
+            <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
+            <span>Run code</span>
           </button>
-
-          {/* Submit Button (Capacitor charge styling) */}
           <button
+            type="button"
             onClick={() => {
               setActiveTab('output');
               onSubmit();
             }}
             disabled={isEvaluating}
-            className="btn-charge flex items-center space-x-2 px-5 py-2 rounded-lg bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold shadow-[0_0_15px_rgba(0,102,255,0.4)] transition-all disabled:opacity-50"
+            className="btn-charge focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border border-enginx-cta bg-enginx-cta px-4 text-xs font-bold text-white hover:border-amber-700 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           >
             {isEvaluating ? (
               <>
-                <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Simulating...</span>
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" />
+                <span>Simulating…</span>
               </>
             ) : (
               <>
-                <Send className="w-3.5 h-3.5" />
-                <span>Submit Solution</span>
+                <Send className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>Submit solution</span>
               </>
             )}
           </button>
         </div>
       </div>
-    </div>
+    </section>
   );
 };

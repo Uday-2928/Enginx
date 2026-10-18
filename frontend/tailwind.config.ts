@@ -5,47 +5,35 @@ const config: Config = {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
+  // EnginX is intentionally light-first. No dark-mode utilities are needed.
   theme: {
     extend: {
       colors: {
         enginx: {
-          blue: '#0066FF',      // Electric Blue (Primary)
-          green: '#2ECC71',     // Circuit Green (Secondary)
-          purple: '#A901DB',    // Neon Purple (Accent AI/Cyber)
-          charcoal: '#2C3E50',  // Deep Charcoal (Neutral)
-          dark: '#0B0F17',      // Circuit Board Dark
-          surface: '#111827',   // Surface
-          card: '#161F2E',      // Card Container
-          border: '#223147',    // Circuit Line Border
-          lightbg: '#F8FAFC',
-          lightcard: '#FFFFFF',
-          lightborder: '#E2E8F0',
+          primary: '#0D9488',   // Teal 600
+          secondary: '#2DD4BF', // Teal 400
+          cta: '#D97706',       // Amber 600
+          canvas: '#F0FDFA',     // Teal 50
+          surface: '#FFFFFF',
+          ink: '#0F172A',
+          muted: '#475569',
+          line: '#99F6E4',
+          success: '#15803D',
+          danger: '#DC2626',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        mono: ['Fira Code', 'JetBrains Mono', 'monospace'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', '"Fira Code"', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       animation: {
-        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'trace-draw': 'traceDraw 3s ease-in-out infinite',
-        'signal-wave': 'signalWave 1.5s ease-in-out infinite',
+        'fade-in': 'fadeIn 180ms ease-out both',
       },
       keyframes: {
-        pulseGlow: {
-          '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 12px rgba(0, 102, 255, 0.6))' },
-          '50%': { opacity: '0.6', filter: 'drop-shadow(0 0 4px rgba(0, 102, 255, 0.2))' },
+        fadeIn: {
+          from: { opacity: '0', transform: 'translateY(4px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
         },
-        traceDraw: {
-          '0%': { strokeDashoffset: '100' },
-          '50%': { strokeDashoffset: '0' },
-          '100%': { strokeDashoffset: '100' },
-        },
-        signalWave: {
-          '0%, 100%': { transform: 'scaleY(0.4)' },
-          '50%': { transform: 'scaleY(1.0)' },
-        }
       }
     },
   },

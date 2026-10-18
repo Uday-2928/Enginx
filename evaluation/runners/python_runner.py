@@ -29,9 +29,12 @@ class PythonRunner(BaseRunner):
             # Build runner harness
             harness_code = """
 import sys
+import os
 import json
 import time
 import traceback
+
+sys.path.insert(0, os.getcwd())
 
 def run():
     with open('test_cases.json', 'r', encoding='utf-8') as f:

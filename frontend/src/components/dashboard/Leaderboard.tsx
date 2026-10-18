@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Medal, Flame, Zap, Award, ExternalLink } from 'lucide-react';
+import { Flame, Medal, Trophy, Users } from 'lucide-react';
 
 interface LeaderboardUser {
   rank: number;
@@ -19,88 +19,85 @@ export const Leaderboard: React.FC = () => {
     { rank: 3, id: '3', name: 'Kai Takahashi', role: 'ROBOTICS', xp: 980, streak_days: 9, completed_challenges: 9, badges_count: 3 },
     { rank: 4, id: '4', name: 'Alex Rivera (You)', role: 'ECE', xp: 580, streak_days: 5, completed_challenges: 4, badges_count: 2 },
     { rank: 5, id: '5', name: 'Maya Patel', role: 'AI', xp: 520, streak_days: 4, completed_challenges: 4, badges_count: 2 },
-    { rank: 6, id: '6', name: 'Liam O\'Connor', role: 'CSE', xp: 440, streak_days: 3, completed_challenges: 3, badges_count: 1 },
+    { rank: 6, id: '6', name: "Liam O'Connor", role: 'CSE', xp: 440, streak_days: 3, completed_challenges: 3, badges_count: 1 },
   ];
 
+  const rankDisplay = (rank: number) => {
+    if (rank === 1) return <Medal className="h-4 w-4 text-amber-600" aria-hidden="true" />;
+    if (rank === 2) return <Medal className="h-4 w-4 text-slate-500" aria-hidden="true" />;
+    if (rank === 3) return <Medal className="h-4 w-4 text-orange-700" aria-hidden="true" />;
+    return <span className="w-4 text-center text-slate-500">{rank}</span>;
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#223147]">
-        <div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center space-x-2.5">
-            <Trophy className="w-6 h-6 text-amber-400" />
-            <span>Global Engineering Leaderboard</span>
+    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 border-b border-teal-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+        <div className="max-w-2xl">
+          <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800">
+            <Users className="h-3.5 w-3.5" aria-hidden="true" />
+            Community momentum
+          </span>
+          <h1 className="mt-3 flex items-center gap-2 text-3xl font-extrabold tracking-tight text-slate-900">
+            Engineering leaderboard
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Top engineers ranked by verified problem submissions, hardware simulations, and circuit badges.
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            See how learners are progressing through verified submissions, hardware simulations, and discipline badges.
           </p>
         </div>
-
-        <div className="flex items-center space-x-2 text-xs font-mono text-slate-400 bg-[#161F2E] px-3 py-1.5 rounded-lg border border-[#223147]">
-          <span>Reset Cadence:</span>
-          <span className="text-[#0066FF] font-bold">Monthly</span>
+        <div className="flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 sm:self-auto">
+          <Trophy className="h-4 w-4 text-enginx-cta" aria-hidden="true" />
+          <span>Monthly rankings</span>
         </div>
       </div>
 
-      {/* Leaderboard Table Card */}
-      <div className="bg-[#111827] border border-[#223147] rounded-2xl overflow-hidden shadow-xl">
+      <div className="overflow-hidden rounded-2xl border border-teal-100 bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[#161F2E] text-slate-400 uppercase font-mono border-b border-[#223147]">
+          <table className="w-full min-w-[680px] border-collapse text-left text-sm">
+            <caption className="sr-only">Global engineering leaderboard</caption>
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
               <tr>
-                <th className="py-3 px-4 w-16">Rank</th>
-                <th className="py-3 px-4">Engineer</th>
-                <th className="py-3 px-4">Primary Discipline</th>
-                <th className="py-3 px-4 text-center">Completed</th>
-                <th className="py-3 px-4 text-center">Streak</th>
-                <th className="py-3 px-4 text-right">Total XP</th>
+                <th scope="col" className="px-4 py-4 font-semibold">Rank</th>
+                <th scope="col" className="px-4 py-4 font-semibold">Engineer</th>
+                <th scope="col" className="px-4 py-4 font-semibold">Discipline</th>
+                <th scope="col" className="px-4 py-4 text-center font-semibold">Completed</th>
+                <th scope="col" className="px-4 py-4 text-center font-semibold">Streak</th>
+                <th scope="col" className="px-4 py-4 text-right font-semibold">Total XP</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#223147]">
-              {mockLeaderboard.map((u) => {
-                const isCurrentUser = u.name.includes('(You)');
+            <tbody>
+              {mockLeaderboard.map((user) => {
+                const isCurrentUser = user.name.includes('(You)');
                 return (
                   <tr
-                    key={u.id}
-                    className={`hover:bg-[#161F2E]/60 transition-colors ${
-                      isCurrentUser ? 'bg-[#0066FF]/10 font-semibold' : ''
-                    }`}
+                    key={user.id}
+                    className={`border-b border-slate-100 transition-colors last:border-b-0 hover:bg-teal-50/50 ${isCurrentUser ? 'bg-teal-50/70' : ''}`}
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold">
-                      {u.rank === 1 && <span className="text-amber-400 flex items-center space-x-1"><Medal className="w-4 h-4 fill-amber-400" /><span>#1</span></span>}
-                      {u.rank === 2 && <span className="text-slate-300 flex items-center space-x-1"><Medal className="w-4 h-4 fill-slate-300" /><span>#2</span></span>}
-                      {u.rank === 3 && <span className="text-amber-600 flex items-center space-x-1"><Medal className="w-4 h-4 fill-amber-600" /><span>#3</span></span>}
-                      {u.rank > 3 && <span className="text-slate-400 pl-5">#{u.rank}</span>}
-                    </td>
-
-                    <td className="py-3.5 px-4 font-medium text-white flex items-center space-x-2.5">
-                      <div className="w-7 h-7 rounded-full bg-[#161F2E] border border-slate-700 flex items-center justify-center text-[10px] font-bold text-[#0066FF]">
-                        {u.name.charAt(0)}
-                      </div>
-                      <span className={isCurrentUser ? 'text-[#0066FF]' : 'text-slate-200'}>
-                        {u.name}
+                    <td className="px-4 py-4 font-mono font-bold text-slate-700">
+                      <span className="flex items-center gap-2">
+                        {rankDisplay(user.rank)}
+                        <span className="sr-only">Rank {user.rank}</span>
                       </span>
                     </td>
-
-                    <td className="py-3.5 px-4 font-mono">
-                      <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[10px]">
-                        {u.role}
+                    <th scope="row" className="px-4 py-4 font-medium">
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-xs font-bold text-teal-800" aria-hidden="true">
+                          {user.name.charAt(0)}
+                        </span>
+                        <span className={isCurrentUser ? 'font-bold text-teal-800' : 'text-slate-800'}>{user.name}</span>
+                      </span>
+                    </th>
+                    <td className="px-4 py-4">
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">{user.role}</span>
+                    </td>
+                    <td className="px-4 py-4 text-center font-mono text-slate-700">{user.completed_challenges}</td>
+                    <td className="px-4 py-4 text-center">
+                      <span className="inline-flex items-center gap-1 font-mono font-semibold text-amber-700">
+                        <Flame className="h-3.5 w-3.5 text-enginx-cta" aria-hidden="true" />
+                        {user.streak_days}d
                       </span>
                     </td>
-
-                    <td className="py-3.5 px-4 text-center font-mono text-slate-300">
-                      {u.completed_challenges}
-                    </td>
-
-                    <td className="py-3.5 px-4 text-center">
-                      <div className="inline-flex items-center space-x-1 text-amber-400 font-mono font-semibold">
-                        <Flame className="w-3.5 h-3.5 fill-amber-400" />
-                        <span>{u.streak_days}d</span>
-                      </div>
-                    </td>
-
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-[#0066FF]">
-                      <span className="text-white">{u.xp}</span> <span className="text-[10px]">XP</span>
+                    <td className="px-4 py-4 text-right font-mono font-bold text-slate-800">
+                      {user.xp} <span className="text-[10px] text-enginx-primary">XP</span>
                     </td>
                   </tr>
                 );

@@ -9,6 +9,8 @@
     "dev:evaluator": "cd evaluation && uvicorn evaluator:app --reload --port 8001",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
+    "build": "npm --prefix frontend run build",
+    "test": "npm --prefix frontend run test && npm --prefix frontend run build && python evaluation/test_evaluator.py",
     "test:evaluation": "cd evaluation && python test_evaluator.py"
   },
   "keywords": [

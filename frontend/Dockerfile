@@ -1,16 +1,16 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:22.23.3-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
 
 COPY . .
 RUN npm run build
 
 # Production runtime stage with lightweight nginx
-FROM nginx:alpine
+FROM nginx:1.27-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 

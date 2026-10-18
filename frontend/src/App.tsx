@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/layout/Header';
 import { ChallengeList } from './components/challenges/ChallengeList';
 import { ChallengeDetails } from './components/challenges/ChallengeDetails';
@@ -32,9 +32,8 @@ export function App() {
   const [isEvaluating, setIsEvaluating] = useState<boolean>(false);
   const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
 
-  // Modals & Theme
+  // Modal state
   const [isOnboardingOpen, setIsOnboardingOpen] = useState<boolean>(false);
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
   // Sync starter code when challenge switches
   useEffect(() => {
@@ -96,27 +95,23 @@ export function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${isDarkMode ? 'dark bg-[#0B0F17]' : 'bg-slate-50 text-slate-900'}`}>
+    <div className="min-h-screen flex flex-col bg-enginx-canvas text-slate-900">
       {/* Platform Header */}
       <Header
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
-        selectedDiscipline={selectedDiscipline}
-        setSelectedDiscipline={setSelectedDiscipline}
         userXp={userXp}
         streakDays={streakDays}
-        isDarkMode={isDarkMode}
-        toggleDarkMode={() => setIsDarkMode(!isDarkMode)}
         onOpenOnboarding={() => setIsOnboardingOpen(true)}
         userRole={userRole}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex min-h-0 flex-1 flex-col">
         {currentTab === 'challenges' && (
-          <div className="flex-1 max-w-[1720px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 overflow-hidden h-[calc(100vh-4rem)]">
+          <div className="mx-auto grid w-full max-w-[1720px] flex-1 grid-cols-1 gap-4 px-4 py-4 sm:px-6 lg:h-[calc(100vh-7.5rem)] lg:grid-cols-[minmax(250px,0.82fr)_minmax(320px,1.12fr)_minmax(360px,1.45fr)] lg:gap-5 lg:px-8 lg:py-5">
             {/* Left Column: Challenge Navigator (3 cols) */}
-            <div className="lg:col-span-3 h-full overflow-hidden">
+            <div className="min-h-[520px] min-w-0 lg:h-full lg:min-h-0">
               <ChallengeList
                 challenges={challenges}
                 selectedChallengeId={selectedChallenge.id}
@@ -130,7 +125,7 @@ export function App() {
             </div>
 
             {/* Middle Column: Problem Statement & Specs (4 cols) */}
-            <div className="lg:col-span-4 h-full overflow-hidden">
+            <div className="min-h-[520px] min-w-0 lg:h-full lg:min-h-0">
               <ChallengeDetails
                 challenge={selectedChallenge}
                 isCompleted={completedIds.includes(selectedChallenge.id)}
@@ -138,7 +133,7 @@ export function App() {
             </div>
 
             {/* Right Column: Code Editor & Simulation Output (5 cols) */}
-            <div className="lg:col-span-5 h-full overflow-hidden">
+            <div className="min-h-[580px] min-w-0 lg:h-full lg:min-h-0">
               <CodeEditor
                 challenge={selectedChallenge}
                 code={code}

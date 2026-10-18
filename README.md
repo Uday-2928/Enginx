@@ -16,7 +16,7 @@
   * 🤖 **Robotics:** 2-DOF planar manipulator forward kinematics, joint coordinate transforms.
   * 🎛️ **General Hardware:** 2-to-1 Multiplexers (MUX), truth tables, digital gates.
 * **Three-Tier Microservices Architecture:**
-  1. **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS with the EnginX Electric Blue (`#0066FF`), Circuit Green (`#2ECC71`), and Neon Purple (`#A901DB`) design system.
+   1. **Frontend:** React 18 + TypeScript + Vite + Tailwind CSS with a light, modern EnginX design system built around Teal (`#0D9488`), Mint (`#2DD4BF`), Amber (`#D97706`), and a pale Teal canvas (`#F0FDFA`).
   2. **Backend API:** FastAPI (Python 3.11) with SQLAlchemy ORM, Pydantic schemas, and Supabase / PostgreSQL schema support.
   3. **Evaluation Sandbox:** Dedicated Docker microservice supporting isolated execution of Verilog (`iverilog`), C (`gcc`), Python, and CTF solvers.
 * **Gamification & Learning Progress:**
@@ -135,13 +135,23 @@ uvicorn main:app --reload --port 8000
 ### 3. Frontend App
 ```bash
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
+
+The frontend is intentionally light-themed and responsive across mobile, tablet, and desktop layouts.
 
 ---
 
 ## 🧪 Testing Evaluation Runners
+
+Run the complete project check from the repository root after dependencies are installed:
+
+```bash
+npm test
+```
+
+This builds the frontend with the committed `frontend/package-lock.json` and then runs the evaluation sandbox unit tests.
 
 Run the unit tests in the `evaluation` service:
 ```bash
@@ -158,12 +168,13 @@ This tests:
 ---
 
 ## 🎨 Branding & Colors
-* **Primary:** Electric Blue `#0066FF`
-* **Secondary:** Circuit Green `#2ECC71`
-* **Accent:** Neon Purple `#A901DB`
-* **Neutral Dark:** Deep Charcoal `#2C3E50` & Silicon Dark `#0B0F17`
+* **Primary:** Teal `#0D9488`
+* **Secondary:** Mint `#2DD4BF`
+* **Accent / CTA:** Amber `#D97706`
+* **Canvas:** Pale Teal `#F0FDFA`
+* **Surfaces:** White `#FFFFFF` with Slate ink `#0F172A`
 * **UI Typography:** Inter
-* **Code Typography:** Fira Code
+* **Code Typography:** JetBrains Mono / Fira Code
 
 ---
 
