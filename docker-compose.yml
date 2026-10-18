@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+  # ==========================================
+  # Frontend: React 18 + Vite + TypeScript
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: enginx-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_EVALUATION_API=http://localhost:8001
+      - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY:-pk_test_placeholder}
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL:-http://localhost:54321}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY:-placeholder}
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - enginx-network
+
+  # ==========================================
+  # Backend API: FastAPI (Python 3.11)
+  # ==========================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: enginx-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - EVALUATION_SERVICE_URL=http://evaluator:8001/api/evaluate
+      - DATABASE_URL=sqlite:///./enginx.db
+      - ENVIRONMENT=development
+      - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
+    depends_on:
+      - evaluator
+    volumes:
+      - ./backend/data:/app/data
+    restart: unless-stopped
+    networks:
+      - enginx-network
+
+  # ==========================================
+  # Evaluation Sandbox Microservice
+  # Isolated execution for Verilog, C, Python, CTF
+  # ==========================================
+  evaluator:
+    build:
+      context: ./evaluation
+      dockerfile: Dockerfile
+    container_name: enginx-evaluator
+    ports:
+      - "8001:8001"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - MAX_TIMEOUT_SECONDS=10
+      - MAX_MEMORY_MB=256
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    networks:
+      - enginx-network
+
+networks:
+  enginx-network:
+    driver: bridge

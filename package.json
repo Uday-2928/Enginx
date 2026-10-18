@@ -1,0 +1,26 @@
+{
+  "name": "enginx-platform",
+  "version": "1.0.0",
+  "description": "EnginX: Multi-Discipline Engineering Learning Platform (CSE, ECE, AI, Cyber, Robotics, Hardware)",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:backend": "cd backend && uvicorn main:app --reload --port 8000",
+    "dev:evaluator": "cd evaluation && uvicorn evaluator:app --reload --port 8001",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "test:evaluation": "cd evaluation && python test_evaluator.py"
+  },
+  "keywords": [
+    "education",
+    "leetcode",
+    "verilog",
+    "embedded-c",
+    "cybersecurity",
+    "robotics",
+    "hardware",
+    "ai-ml"
+  ],
+  "author": "EnginX Team",
+  "license": "MIT"
+}

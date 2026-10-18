@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+/* Circuit trace subtle background grid */
+.circuit-grid {
+  background-size: 32px 32px;
+  background-image:
+    linear-gradient(to right, rgba(34, 49, 71, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(34, 49, 71, 0.25) 1px, transparent 1px);
+}
+
+/* Light mode overrides */
+html:not(.dark) .circuit-grid {
+  background-image:
+    linear-gradient(to right, rgba(226, 232, 240, 0.8) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.8) 1px, transparent 1px);
+}
+
+/* Capacitor Charge Button Hover */
+.btn-charge {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease-in-out;
+}
+
+.btn-charge::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease-in-out;
+}
+
+.btn-charge:hover::before {
+  left: 100%;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0F17;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #223147;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0066FF;
+}
+
+/* Glow effects */
+.glow-blue {
+  box-shadow: 0 0 15px rgba(0, 102, 255, 0.35);
+}
+
+.glow-green {
+  box-shadow: 0 0 15px rgba(46, 204, 113, 0.4);
+}
+
+.glow-purple {
+  box-shadow: 0 0 15px rgba(169, 1, 219, 0.35);
+}

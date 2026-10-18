@@ -1,0 +1,66 @@
+name: EnginX CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend-lint:
+    name: Frontend Lint and Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm run build
+
+  backend-test:
+    name: Backend API Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt
+      - run: python -c "from main import app; print('FastAPI loaded OK')"
+
+  evaluation-test:
+    name: Evaluation Sandbox Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./evaluation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y iverilog gcc
+      - run: pip install -r requirements.txt
+      - run: python test_evaluator.py
+
+  docker-build:
+    name: Docker Compose Build
+    runs-on: ubuntu-latest
+    needs: [frontend-lint, backend-test, evaluation-test]
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose build
+      - run: |
+          docker compose up -d
+          sleep 10
+          curl --retry 5 --retry-delay 3 -f http://localhost:8000/health
+          curl --retry 5 --retry-delay 3 -f http://localhost:8001/health
+          docker compose down
