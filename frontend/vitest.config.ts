@@ -7,5 +7,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     restoreMocks: true,
+    // Full-workspace jsdom tests are memory-heavy. Run files serially so a
+    // small development machine does not page several React/Three workers.
+    fileParallelism: false,
+    testTimeout: 20000,
   },
 });

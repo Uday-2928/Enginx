@@ -12,7 +12,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=${VITE_API_URL:-}
+      - API_PROXY_TARGET=http://backend:8000
       - VITE_EVALUATION_API=http://localhost:8001
       - VITE_CLERK_PUBLISHABLE_KEY=${VITE_CLERK_PUBLISHABLE_KEY:-pk_test_placeholder}
       - VITE_SUPABASE_URL=${VITE_SUPABASE_URL:-http://localhost:54321}
@@ -35,7 +36,10 @@ services:
       - "8000:8000"
     environment:
       - EVALUATION_SERVICE_URL=http://evaluator:8001/api/evaluate
-      - DATABASE_URL=sqlite:///./enginx.db
+      # Absolute path keeps the SQLite database inside the mounted volume, so
+      # learner data survives container rebuilds.  A relative path would write
+      # to the ephemeral container filesystem instead.
+      - DATABASE_URL=sqlite:////app/data/enginx.db
       - ENVIRONMENT=development
       - ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
     depends_on:
@@ -66,8 +70,16 @@ services:
         limits:
           cpus: "1.0"
           memory: 512M
+    cpus: "1.0"
+    mem_limit: 512m
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=128m
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     restart: unless-stopped
     networks:
       - enginx-network

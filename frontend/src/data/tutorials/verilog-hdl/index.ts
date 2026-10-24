@@ -1,0 +1,127 @@
+import type { TutorialCourse } from '../types';
+
+export const course: TutorialCourse = {
+  id: 'verilog-hdl',
+  title: 'Complete Verilog HDL',
+  tagline: 'Write synthesizable Verilog from your first module to full testbenches.',
+  description:
+    'A complete journey through Verilog HDL: module structure, data types, operators, continuous and procedural assignments, blocking versus nonblocking semantics, combinational and sequential design, FSMs, memories, parameterized generate blocks, testbenches and the synthesis mistakes that produce accidental latches. Every lesson is written with synthesis and timing consequences in mind.',
+  level: 'intermediate',
+  status: 'draft',
+  domains: ['ECE'],
+  trackTags: ['FPGA', 'VLSI', 'Digital Design'],
+  estimatedHours: 30,
+  prerequisites: ['digital-electronics'],
+  skills: [
+    'Writing synthesizable Verilog modules',
+    'Blocking vs nonblocking assignment discipline',
+    'Combinational and sequential RTL design',
+    'Finite-state machine coding',
+    'Testbench writing and simulation',
+    'Avoiding latches and synthesis traps',
+  ],
+  modules: [
+    {
+      id: 'm01',
+      title: 'Introduction to Verilog',
+      summary: 'What a hardware description language describes, simulation versus synthesis, design hierarchy and the Verilog tool flow.',
+      lessons: [],
+    },
+    {
+      id: 'm02',
+      title: 'Module Structure',
+      summary: 'Module declarations, ports and directions, port styles, instantiation, hierarchical naming and top-level design organization.',
+      lessons: [],
+    },
+    {
+      id: 'm03',
+      title: 'Data Types & Values',
+      summary: 'wire and reg, vectors, the four-valued 0/1/x/z system, parameter and localparam, signed arithmetic and memory declarations.',
+      lessons: [],
+    },
+    {
+      id: 'm04',
+      title: 'Operators',
+      summary: 'Arithmetic, bitwise, reduction, logical, shift, relational, equality and concatenation operators with width-extension rules.',
+      lessons: [],
+    },
+    {
+      id: 'm05',
+      title: 'Continuous Assignments',
+      summary: 'assign statements, dataflow modelling, conditional and multiplication operators in assignments, and combinational always blocks as an alternative.',
+      lessons: [],
+    },
+    {
+      id: 'm06',
+      title: 'Procedural Blocks',
+      summary: 'initial and always blocks, sensitivity lists, begin/end sequencing, blocking and nonblocking assignment mechanics.',
+      lessons: [],
+    },
+    {
+      id: 'm07',
+      title: 'Blocking vs Nonblocking',
+      summary: 'Simulation semantics of = and <=, race conditions, the synthesis-safe coding rules and why mixing styles in one block creates bugs.',
+      lessons: [],
+    },
+    {
+      id: 'm08',
+      title: 'Combinational Design',
+      summary: 'Coding multiplexers, decoders, adders and ALU slices with always @* blocks and avoiding incomplete sensitivity lists.',
+      lessons: [],
+    },
+    {
+      id: 'm09',
+      title: 'Sequential Design',
+      summary: 'Flip-flops and registers with always @(posedge clk), synchronous and asynchronous resets, enables and clock-enable patterns.',
+      lessons: [],
+    },
+    {
+      id: 'm10',
+      title: 'Counters & Registers',
+      summary: 'Binary, Johnson and ring counters, shift registers, load/clear enables and counter rollover and comparison patterns.',
+      lessons: [],
+    },
+    {
+      id: 'm11',
+      title: 'Finite-State Machines',
+      summary: 'Two-process and three-process FSM styles, state encoding, Moore and Mealy outputs, and safe FSM design with default assignments.',
+      lessons: [],
+    },
+    {
+      id: 'm12',
+      title: 'Memories & Arrays',
+      summary: 'Register arrays, RAM and ROM modelling, address decoding, initialization and inferring block versus distributed memory.',
+      lessons: [],
+    },
+    {
+      id: 'm13',
+      title: 'Functions, Tasks, Parameters & Generate',
+      summary: 'Reusable combinational logic with functions, simulation helpers with tasks, parameterized modules and generate loops and conditionals.',
+      lessons: [],
+    },
+    {
+      id: 'm14',
+      title: 'Testbenches & Simulation',
+      summary: 'Stimulus generation, clock and reset generation, self-checking testbenches, $display and waveform-based debugging flow.',
+      lessons: [],
+    },
+    {
+      id: 'm15',
+      title: 'Latches & Synthesis Mistakes',
+      summary: 'How incomplete if and case statements infer latches, combinational loops, width mismatches, simulation-synthesis mismatch causes.',
+      lessons: [],
+    },
+    {
+      id: 'm16',
+      title: 'RTL Projects',
+      summary: 'Capstone module that assembles counters, FSMs, datapath elements and testbenches into complete, reviewable RTL designs.',
+      lessons: [],
+    },
+  ],
+  projects: [],
+  resources: [
+    { label: 'Icarus Verilog documentation', url: 'https://steveicarus.github.io/iverilog/', kind: 'tool' },
+    { label: 'Yosys open synthesis suite documentation', url: 'https://yosyshq.readthedocs.io/', kind: 'tool' },
+    { label: 'Wikipedia — Verilog', url: 'https://en.wikipedia.org/wiki/Verilog', kind: 'article' },
+  ],
+};

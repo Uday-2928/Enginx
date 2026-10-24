@@ -104,6 +104,20 @@ CREATE TABLE IF NOT EXISTS community_posts (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- 8. VIRTUAL HARDWARE PROJECTS
+-- Persisted circuit/source state only; renderer/runtime objects are not stored.
+CREATE TABLE IF NOT EXISTS virtual_hardware_projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    owner_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    board_profile VARCHAR(100) NOT NULL,
+    project_version INTEGER NOT NULL DEFAULT 1,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- ========================================================
 -- INDEXES & PERFORMANCE
 -- ========================================================
@@ -112,6 +126,7 @@ CREATE INDEX IF NOT EXISTS idx_submissions_user ON submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_challenge ON submissions(challenge_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_user ON user_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_progress_challenge ON user_progress(challenge_id);
+CREATE INDEX IF NOT EXISTS idx_virtual_hardware_projects_owner ON virtual_hardware_projects(owner_id);
 
 -- ========================================================
 -- LEADERBOARD VIEW
@@ -142,11 +157,15 @@ ALTER TABLE user_progress ENABLE ROW LEVEL SECURITY;
 ALTER TABLE badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_badges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE community_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE virtual_hardware_projects ENABLE ROW LEVEL SECURITY;
 
 -- Public read for challenges & badges
 CREATE POLICY "Public read for challenges" ON challenges FOR SELECT USING (true);
 CREATE POLICY "Public read for badges" ON badges FOR SELECT USING (true);
 CREATE POLICY "Public read for community posts" ON community_posts FOR SELECT USING (true);
+CREATE POLICY "Owners manage virtual hardware projects" ON virtual_hardware_projects
+    USING (owner_id = auth.uid())
+    WITH CHECK (owner_id = auth.uid());
 
 -- User-specific policies
 CREATE POLICY "Users can view own profile" ON users FOR SELECT USING (auth.uid()::text = clerk_id OR auth.uid() = id);

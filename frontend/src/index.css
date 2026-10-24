@@ -113,6 +113,25 @@ textarea:focus-visible {
   .challenge-copy pre code {
     @apply border-0 bg-transparent p-0 text-slate-800;
   }
+
+  .professional-editor .monaco-editor,
+  .professional-editor .monaco-editor-background,
+  .professional-editor .monaco-editor .margin {
+    background: transparent !important;
+  }
+
+  .professional-editor .monaco-editor .scrollbar > .slider {
+    background: rgba(148, 163, 184, 0.35) !important;
+    border-radius: 999px;
+  }
+
+  .professional-editor .monaco-editor .scrollbar > .slider:hover {
+    background: rgba(45, 212, 191, 0.65) !important;
+  }
+
+  .professional-editor--enginx-light .monaco-editor .scrollbar > .slider {
+    background: rgba(100, 116, 139, 0.35) !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

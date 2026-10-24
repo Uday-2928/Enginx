@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Activity,
   Bot,
   CheckCircle2,
   Code2,
@@ -9,20 +10,24 @@ import {
   Shield,
   Sparkles,
   Terminal,
+  Radio,
   Zap,
+  Waves,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Challenge, Discipline } from '../../types';
+import type { Challenge, ChallengeFilter } from '../../types';
+import { getFilterOptionsForBranch } from '../../data/challengeFilters';
 
 interface ChallengeListProps {
   challenges: Challenge[];
   selectedChallengeId: string;
   onSelectChallenge: (c: Challenge) => void;
   completedIds: string[];
-  selectedDiscipline: Discipline;
-  setSelectedDiscipline: (d: Discipline) => void;
+  selectedDiscipline: ChallengeFilter;
+  setSelectedDiscipline: (d: ChallengeFilter) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
+  branch?: string;
 }
 
 export const ChallengeList: React.FC<ChallengeListProps> = ({
@@ -34,17 +39,24 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({
   setSelectedDiscipline,
   searchQuery,
   setSearchQuery,
+  branch,
 }) => {
-  const disciplines: { id: Discipline; label: string; icon: LucideIcon }[] = [
-    { id: 'all', label: 'All tracks', icon: Sparkles },
-    { id: 'cse', label: 'CSE', icon: Code2 },
-    { id: 'ece-verilog', label: 'ECE · Verilog', icon: Cpu },
-    { id: 'ece-embedded', label: 'Embedded C', icon: Terminal },
-    { id: 'ai-ml', label: 'AI & ML', icon: Bot },
-    { id: 'cybersecurity', label: 'Cybersecurity', icon: Shield },
-    { id: 'robotics', label: 'Robotics', icon: Bot },
-    { id: 'hardware', label: 'Hardware', icon: Cpu },
-  ];
+  const iconForFilter = (id: ChallengeFilter): LucideIcon => {
+    switch (id) {
+      case 'all': return Sparkles;
+      case 'cse': return Code2;
+      case 'ece-verilog': return Cpu;
+      case 'ece-embedded': return Terminal;
+      case 'ece-matlab': return Waves;
+      case 'ece-signals': return Waves;
+      case 'ece-dsp': return Activity;
+      case 'ece-communications': return Radio;
+      case 'ai-ml': return Bot;
+      case 'cybersecurity': return Shield;
+      case 'robotics': return Bot;
+      case 'hardware': return Cpu;
+    }
+  };
 
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
@@ -86,7 +98,8 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({
 
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none" aria-label="Filter by discipline">
           <Filter className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
-          {disciplines.map(({ id, label, icon: Icon }) => {
+          {getFilterOptionsForBranch(branch).map(({ id, label, description }) => {
+            const Icon = iconForFilter(id);
             const isSelected = selectedDiscipline === id;
             return (
               <button
@@ -94,6 +107,7 @@ export const ChallengeList: React.FC<ChallengeListProps> = ({
                 type="button"
                 onClick={() => setSelectedDiscipline(id)}
                 aria-pressed={isSelected}
+                title={description}
                 className={`focus-ring flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 text-xs font-semibold transition-colors ${
                   isSelected
                     ? 'border-teal-600 bg-teal-600 text-white'

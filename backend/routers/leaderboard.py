@@ -2,11 +2,16 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User, UserProgress, UserBadge
+from security import get_current_user
 
 router = APIRouter(prefix="/api/leaderboard", tags=["Leaderboard"])
 
 @router.get("")
-def get_leaderboard(limit: int = 20, db: Session = Depends(get_db)):
+def get_leaderboard(
+    limit: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     users = db.query(User).order_by(User.xp.desc()).limit(limit).all()
     results = []
     for rank, u in enumerate(users, start=1):

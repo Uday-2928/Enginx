@@ -14,9 +14,16 @@ FROM nginx:1.27-alpine
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Custom nginx config to handle client-side routing
+# Custom nginx config with MIME types and client-side routing
 RUN echo 'server { \
     listen 5173; \
+    include /etc/nginx/mime.types; \
+    default_type application/octet-stream; \
+    location /api/ { \
+        proxy_pass http://backend:8000; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+    } \
     location / { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \

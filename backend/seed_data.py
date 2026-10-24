@@ -209,9 +209,232 @@ endmodule
             "Use non-blocking assignments (`<=`) inside sequential `always @(posedge clk)` blocks."
         ]
     },
+    {
+        "id": "ece-04-half-adder",
+        "slug": "half-adder-gate-composition",
+        "title": "Half Adder: XOR Sum and AND Carry",
+        "discipline": "ece-verilog",
+        "difficulty": "Easy",
+        "topic": "Logic Gates & Combinational Arithmetic",
+        "language": "verilog",
+        "order_index": 3,
+        "xp_reward": 65,
+        "tags": ["Logic Gates", "Verilog", "XOR", "AND", "Half Adder"],
+        "description": """### Problem Statement
+Build a two-input **half adder** using synthesizable Verilog.
+
+The module must expose `a`, `b`, `sum` and `carry`. The sum bit is high when
+the inputs differ. The carry bit is high only when both inputs are high.
+
+| a | b | sum | carry |
+|---|---|-----|-------|
+| 0 | 0 | 0 | 0 |
+| 0 | 1 | 1 | 0 |
+| 1 | 0 | 1 | 0 |
+| 1 | 1 | 0 | 1 |""",
+        "starter_code": """module half_adder(
+    input  wire a,
+    input  wire b,
+    output wire sum,
+    output wire carry
+);
+    // TODO: sum is XOR; carry is AND.
+endmodule
+""",
+        "test_cases": [
+            {"id": "1", "input": {"a": 0, "b": 0}, "expected": {"sum": 0, "carry": 0}, "hidden": False},
+            {"id": "2", "input": {"a": 0, "b": 1}, "expected": {"sum": 1, "carry": 0}, "hidden": False},
+            {"id": "3", "input": {"a": 1, "b": 0}, "expected": {"sum": 1, "carry": 0}, "hidden": False},
+            {"id": "4", "input": {"a": 1, "b": 1}, "expected": {"sum": 0, "carry": 1}, "hidden": True},
+        ],
+        "solution_hints": [
+            "Use `assign sum = a ^ b;` for the sum bit.",
+            "Use `assign carry = a & b;` for the carry bit.",
+        ],
+    },
+    {
+        "id": "ece-05-not-gate",
+        "slug": "verilog-not-gate",
+        "title": "Verilog NOT Gate Primitive",
+        "discipline": "ece-verilog",
+        "difficulty": "Easy",
+        "topic": "Logic Gates",
+        "language": "verilog",
+        "order_index": 4,
+        "xp_reward": 40,
+        "tags": ["Logic Gates", "Verilog", "NOT", "Combinational"],
+        "description": """### Problem Statement
+Implement a one-input inverter. The output must be the complement of the input.
+
+Use the interface `module not_gate(input wire a, output wire y);` and choose a
+gate primitive or dataflow assignment.""",
+        "starter_code": """module not_gate(input wire a, output wire y);
+    // TODO: implement y = NOT a
+endmodule
+""",
+        "test_cases": [
+            {"id": "1", "input": {"a": 0}, "expected": 1, "hidden": False},
+            {"id": "2", "input": {"a": 1}, "expected": 0, "hidden": True},
+        ],
+        "solution_hints": ["Gate primitive: `not (y, a);`", "Dataflow: `assign y = ~a;`"],
+    },
+    {
+        "id": "ece-06-and-gate",
+        "slug": "verilog-and-gate",
+        "title": "Verilog AND Gate Primitive",
+        "discipline": "ece-verilog",
+        "difficulty": "Easy",
+        "topic": "Logic Gates",
+        "language": "verilog",
+        "order_index": 5,
+        "xp_reward": 40,
+        "tags": ["Logic Gates", "Verilog", "AND", "Truth Table"],
+        "description": """### Problem Statement
+Implement a two-input AND gate. The output is high only when both inputs are high.
+
+Use the interface `module and_gate(input wire a, input wire b, output wire y);`.""",
+        "starter_code": """module and_gate(input wire a, input wire b, output wire y);
+    // TODO: implement y = a AND b
+endmodule
+""",
+        "test_cases": [
+            {"id": "1", "input": {"a": 0, "b": 0}, "expected": 0, "hidden": False},
+            {"id": "2", "input": {"a": 1, "b": 1}, "expected": 1, "hidden": True},
+        ],
+        "solution_hints": ["Gate primitive: `and (y, a, b);`", "Dataflow: `assign y = a & b;`"],
+    },
+    {
+        "id": "ece-07-or-gate",
+        "slug": "verilog-or-gate",
+        "title": "Verilog OR Gate Primitive",
+        "discipline": "ece-verilog",
+        "difficulty": "Easy",
+        "topic": "Logic Gates",
+        "language": "verilog",
+        "order_index": 6,
+        "xp_reward": 40,
+        "tags": ["Logic Gates", "Verilog", "OR", "Truth Table"],
+        "description": """### Problem Statement
+Implement a two-input OR gate. The output is low only when both inputs are low.
+
+Use the interface `module or_gate(input wire a, input wire b, output wire y);`.""",
+        "starter_code": """module or_gate(input wire a, input wire b, output wire y);
+    // TODO: implement y = a OR b
+endmodule
+""",
+        "test_cases": [
+            {"id": "1", "input": {"a": 0, "b": 0}, "expected": 0, "hidden": False},
+            {"id": "2", "input": {"a": 1, "b": 0}, "expected": 1, "hidden": True},
+        ],
+        "solution_hints": ["Gate primitive: `or (y, a, b);`", "Dataflow: `assign y = a | b;`"],
+    },
 
     # ==========================================
-    # 3. ECE - Embedded C
+    # 3. ECE - MATLAB / Signals, DSP and communications
+    # ==========================================
+    {
+        "id": "ece-matlab-01-sampling",
+        "slug": "matlab-alias-frequency",
+        "title": "MATLAB Sampling: Calculate the Alias Frequency",
+        "discipline": "ece-matlab",
+        "difficulty": "Easy",
+        "topic": "Signals & Systems · Sampling",
+        "language": "matlab",
+        "order_index": 1,
+        "xp_reward": 60,
+        "tags": ["MATLAB", "Signals", "Sampling", "Nyquist", "Aliasing"],
+        "description": """### Problem Statement
+Return the apparent frequency of a sinusoid after sampling. Fold `f0` into the first Nyquist zone with `abs(mod(f0 + fs/2, fs) - fs/2)`.""",
+        "starter_code": """function alias = alias_frequency(fs, f0)
+    % Return the folded frequency in the first Nyquist zone.
+    alias = 0;
+end
+""",
+        "test_cases": [
+            {"id": "1", "input": {"fs": 8000, "f0": 1000}, "expected": 1000, "entry_point": "alias_frequency", "hidden": False},
+            {"id": "2", "input": {"fs": 8000, "f0": 7000}, "expected": 1000, "entry_point": "alias_frequency", "hidden": False},
+            {"id": "3", "input": {"fs": 8000, "f0": 5000}, "expected": 3000, "entry_point": "alias_frequency", "hidden": True},
+        ],
+        "solution_hints": ["Wrap with `mod` and fold around `fs/2`.", "The result should be non-negative and no larger than the Nyquist frequency."],
+    },
+    {
+        "id": "ece-matlab-02-convolution",
+        "slug": "matlab-discrete-convolution",
+        "title": "MATLAB DSP: Discrete Convolution",
+        "discipline": "ece-matlab",
+        "difficulty": "Easy",
+        "topic": "DSP · LTI Systems",
+        "language": "matlab",
+        "order_index": 2,
+        "xp_reward": 70,
+        "tags": ["MATLAB", "DSP", "Convolution", "LTI"],
+        "description": """### Problem Statement
+Implement the complete finite-length linear convolution `y = discrete_convolution(x, h)`.""",
+        "starter_code": """function y = discrete_convolution(x, h)
+    % Compute y[n] = x[n] * h[n].
+    y = [];
+end
+""",
+        "test_cases": [
+            {"id": "1", "input": {"x": [1, 2, 1], "h": [1, -1, 2]}, "expected": [1, 1, 1, 3, 2], "entry_point": "discrete_convolution", "hidden": False},
+            {"id": "2", "input": {"x": [1, 0, -1], "h": [2, 2]}, "expected": [2, 2, -2, -2], "entry_point": "discrete_convolution", "hidden": False},
+            {"id": "3", "input": {"x": [2, 3], "h": [4]}, "expected": [8, 12], "entry_point": "discrete_convolution", "hidden": True},
+        ],
+        "solution_hints": ["`conv(x, h)` returns the full output.", "The output length is `length(x) + length(h) - 1`."],
+    },
+    {
+        "id": "ece-matlab-03-fft-spectrum",
+        "slug": "matlab-fft-bin-spacing",
+        "title": "MATLAB DSP: FFT Bin Spacing",
+        "discipline": "ece-matlab",
+        "difficulty": "Easy",
+        "topic": "DSP · DFT and FFT",
+        "language": "matlab",
+        "order_index": 3,
+        "xp_reward": 65,
+        "tags": ["MATLAB", "DSP", "DFT", "FFT", "Spectrum"],
+        "description": """### Problem Statement
+Return the frequency resolution of an N-point DFT: `delta_f = fs/N`.""",
+        "starter_code": """function delta_f = fft_bin_spacing(fs, N)
+    % Return the frequency resolution of an N-point DFT.
+    delta_f = 0;
+end
+""",
+        "test_cases": [
+            {"id": "1", "input": {"fs": 8000, "N": 1024}, "expected": 7.8125, "entry_point": "fft_bin_spacing", "hidden": False},
+            {"id": "2", "input": {"fs": 48000, "N": 4096}, "expected": 11.71875, "entry_point": "fft_bin_spacing", "hidden": False},
+            {"id": "3", "input": {"fs": 1000, "N": 100}, "expected": 10, "entry_point": "fft_bin_spacing", "hidden": True},
+        ],
+        "solution_hints": ["The sampling rate is the full frequency span.", "Divide by the number of DFT bins."],
+    },
+    {
+        "id": "ece-matlab-04-bpsk-symbols",
+        "slug": "matlab-bpsk-symbol-mapping",
+        "title": "MATLAB Communications: BPSK Symbol Mapping",
+        "discipline": "ece-matlab",
+        "difficulty": "Easy",
+        "topic": "Communication Systems · Digital Modulation",
+        "language": "matlab",
+        "order_index": 4,
+        "xp_reward": 70,
+        "tags": ["MATLAB", "Communications", "BPSK", "Modulation"],
+        "description": """### Problem Statement
+Map binary bits to antipodal BPSK symbols: `1 -> +1` and `0 -> -1`.""",
+        "starter_code": """function symbols = bpsk_map(bits)
+    % Map 0 -> -1 and 1 -> +1.
+    symbols = zeros(size(bits));
+end
+""",
+        "test_cases": [
+            {"id": "1", "input": {"bits": [1, 0, 1, 1, 0]}, "expected": [1, -1, 1, 1, -1], "entry_point": "bpsk_map", "hidden": False},
+            {"id": "2", "input": {"bits": [0, 0, 1]}, "expected": [-1, -1, 1], "entry_point": "bpsk_map", "hidden": False},
+            {"id": "3", "input": {"bits": [1, 1, 1, 0]}, "expected": [1, 1, 1, -1], "entry_point": "bpsk_map", "hidden": True},
+        ],
+        "solution_hints": ["The vectorized affine mapping is `2 * bits - 1`.", "Preserve the input shape."],
+    },
+
+    # ==========================================
+    # 4. ECE - Embedded C
     # ==========================================
     {
         "id": "ece-03-gpio-bit-toggle",

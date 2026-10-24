@@ -1,27 +1,12 @@
 import React from 'react';
 import { Flame, Medal, Trophy, Users } from 'lucide-react';
+import type { LeaderboardEntry } from '../../types';
 
-interface LeaderboardUser {
-  rank: number;
-  id: string;
-  name: string;
-  role: string;
-  xp: number;
-  streak_days: number;
-  completed_challenges: number;
-  badges_count: number;
+interface LeaderboardProps {
+  entries?: LeaderboardEntry[];
 }
 
-export const Leaderboard: React.FC = () => {
-  const mockLeaderboard: LeaderboardUser[] = [
-    { rank: 1, id: '1', name: 'Elena Rostova', role: 'ECE', xp: 1450, streak_days: 18, completed_challenges: 14, badges_count: 5 },
-    { rank: 2, id: '2', name: 'Devon Vance', role: 'CYBER', xp: 1220, streak_days: 12, completed_challenges: 11, badges_count: 4 },
-    { rank: 3, id: '3', name: 'Kai Takahashi', role: 'ROBOTICS', xp: 980, streak_days: 9, completed_challenges: 9, badges_count: 3 },
-    { rank: 4, id: '4', name: 'Alex Rivera (You)', role: 'ECE', xp: 580, streak_days: 5, completed_challenges: 4, badges_count: 2 },
-    { rank: 5, id: '5', name: 'Maya Patel', role: 'AI', xp: 520, streak_days: 4, completed_challenges: 4, badges_count: 2 },
-    { rank: 6, id: '6', name: "Liam O'Connor", role: 'CSE', xp: 440, streak_days: 3, completed_challenges: 3, badges_count: 1 },
-  ];
-
+export const Leaderboard: React.FC<LeaderboardProps> = ({ entries = [] }) => {
   const rankDisplay = (rank: number) => {
     if (rank === 1) return <Medal className="h-4 w-4 text-amber-600" aria-hidden="true" />;
     if (rank === 2) return <Medal className="h-4 w-4 text-slate-500" aria-hidden="true" />;
@@ -65,8 +50,16 @@ export const Leaderboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {mockLeaderboard.map((user) => {
-                const isCurrentUser = user.name.includes('(You)');
+              {entries.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center">
+                    <Trophy className="mx-auto h-7 w-7 text-teal-600" aria-hidden="true" />
+                    <p className="mt-3 text-sm font-semibold text-slate-800">Leaderboard data is not available yet</p>
+                    <p className="mt-1 text-xs text-slate-500">Connect to the backend to load verified learner rankings.</p>
+                  </td>
+                </tr>
+              ) : entries.map((user) => {
+                const isCurrentUser = user.name.toLowerCase().includes('(you)');
                 return (
                   <tr
                     key={user.id}

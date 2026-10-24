@@ -36,7 +36,7 @@ class VerilogRunner(BaseRunner):
                 f.write(code)
 
             # Generate dynamic test bench from test cases
-            tb_code = self._generate_testbench(module_name, test_cases)
+            tb_code = self._generate_testbench(module_name, code, test_cases)
             with open(tb_path, "w", encoding="utf-8") as f:
                 f.write(tb_code)
 
@@ -97,40 +97,84 @@ class VerilogRunner(BaseRunner):
                 total_count=len(tc_results)
             )
 
-    def _generate_testbench(self, module_name: str, test_cases: List[Dict[str, Any]]) -> str:
-        """
-        Builds a comprehensive Verilog testbench from test cases.
-        """
-        tb = [
-            "`timescale 1ns/1ps",
-            f"module tb;",
-            "  reg clk;",
-            "  reg rst;",
-            "  integer pass_count = 0;",
-            "  integer fail_count = 0;",
-            "",
-            "  initial begin",
-            "    clk = 0;",
-            "    forever #5 clk = ~clk;",
-            "  end",
-            "",
-            "  initial begin"
-        ]
+    def _parse_ports(self, code: str) -> Dict[str, Dict[str, Any]]:
+        """Read simple ANSI/non-ANSI scalar and packed-vector declarations."""
 
-        for idx, tc in enumerate(test_cases):
-            tc_id = tc.get("id", str(idx + 1))
-            inp = tc.get("input", {})
-            exp = tc.get("expected", {})
-            tb.append(f"    // Test Case {tc_id}")
-            tb.append(f"    #10;")
-            tb.append(f'    $display("TEST_RESULT: id={tc_id} pass=1 act={exp} exp={exp}");')
+        ports: Dict[str, Dict[str, Any]] = {}
+        pattern = re.compile(
+            r"\b(input|output)\s+(?:(?:wire|reg|logic)\s+)?"
+            r"(?:\[(\d+)\s*:\s*(\d+)\]\s+)?([A-Za-z_]\w*)"
+        )
+        for match in pattern.finditer(code):
+            direction, msb, lsb, name = match.groups()
+            width = int(msb) - int(lsb) + 1 if msb is not None and lsb is not None else 1
+            ports[name] = {"direction": direction, "width": width}
+        return ports
 
-        tb.extend([
-            "    #20;",
-            "    $finish;",
-            "  end",
-            "endmodule"
-        ])
+    @staticmethod
+    def _literal(value: Any, width: int) -> str:
+        try:
+            numeric = int(value)
+        except (TypeError, ValueError):
+            numeric = 0
+        if width <= 1:
+            return f"1'b{1 if numeric else 0}"
+        return f"{width}'d{numeric}"
+
+    def _check_expression(self, expected: Any, ports: Dict[str, Dict[str, Any]]) -> str:
+        if isinstance(expected, dict):
+            checks = []
+            for name, value in expected.items():
+                if name in ports and ports[name]["direction"] == "output":
+                    checks.append(f"({name} === {self._literal(value, ports[name]['width'])})")
+            return " && ".join(checks) or "1'b0"
+        output_names = [name for name, port in ports.items() if port["direction"] == "output"]
+        if not output_names:
+            return "1'b0"
+        name = output_names[0]
+        return f"({name} === {self._literal(expected, ports[name]['width'])})"
+
+    def _generate_testbench(self, module_name: str, code: str, test_cases: List[Dict[str, Any]]) -> str:
+        """Generate a real self-checking testbench for simple module interfaces."""
+
+        ports = self._parse_ports(code)
+        input_names = [name for name, port in ports.items() if port["direction"] == "input"]
+        output_names = [name for name, port in ports.items() if port["direction"] == "output"]
+        if not input_names or not output_names:
+            return "module tb; initial begin $display(\"TEST_RESULT: id=1 pass=0\"); $finish; end endmodule"
+
+        declarations = []
+        for name in input_names:
+            width = ports[name]["width"]
+            declarations.append(f"  reg {f'[ {width - 1}:0 ]' if width > 1 else ''} {name};".replace('[ ', '[').replace(' ]', ']'))
+        for name in output_names:
+            width = ports[name]["width"]
+            declarations.append(f"  wire {f'[ {width - 1}:0 ]' if width > 1 else ''} {name};".replace('[ ', '[').replace(' ]', ']'))
+
+        connections = ", ".join(f".{name}({name})" for name in ports)
+        has_clock = "clk" in ports and ports["clk"]["direction"] == "input"
+        tb = ["`timescale 1ns/1ps", "module tb;", *declarations, f"  {module_name} dut ({connections});"]
+        if has_clock:
+            tb.extend(["  initial clk = 1'b0;", "  always #5 clk = ~clk;"])
+        tb.append("  initial begin")
+
+        for idx, test_case in enumerate(test_cases):
+            tc_id = str(test_case.get("id", idx + 1)).replace('"', "'")
+            inputs = test_case.get("input", {}) if isinstance(test_case.get("input", {}), dict) else {}
+            for name in input_names:
+                if name == "clk":
+                    continue
+                if name in inputs:
+                    tb.append(f"    {name} = {self._literal(inputs[name], ports[name]['width'])};")
+            if has_clock:
+                tb.append("    @(posedge clk);")
+                tb.append("    #1;")
+            else:
+                tb.append("    #1;")
+            expression = self._check_expression(test_case.get("expected"), ports)
+            tb.append(f'    $display("TEST_RESULT: id={tc_id} pass=%0d", {expression});')
+
+        tb.extend(["    #1;", "    $finish;", "  end", "endmodule"])
         return "\n".join(tb)
 
     def _parse_simulation_output(self, output: str, test_cases: List[Dict[str, Any]]) -> List[TestCaseResult]:
@@ -178,14 +222,29 @@ class VerilogRunner(BaseRunner):
             inp = tc.get("input", {})
             expected = tc.get("expected")
 
-            # Emulate logic based on input parameters
-            # E.g. Adder (a + b + cin), Flip-Flop (d -> q), Multiplexer (sel ? a : b)
+            # Emulate only the small, documented two-state exercises used by
+            # the offline developer environment.  This is not a replacement
+            # for Icarus Verilog; the real evaluator path is preferred when the
+            # toolchain is installed.
             passed = True
             actual_val = expected
             err_msg = None
+            source = code.lower()
+
+            # Half-adder logic: sum = XOR, carry = AND.
+            if isinstance(expected, dict) and "sum" in expected and "carry" in expected:
+                if not (re.search(r"\bsum\b.*\^|\bxor\b", source) and re.search(r"\bcarry\b.*&|\band\b", source)):
+                    passed = False
+                    err_msg = "Half-adder source must define XOR sum and AND carry logic."
+                    actual_val = "Missing XOR/AND implementation"
+                else:
+                    a = int(inp.get("a", 0))
+                    b = int(inp.get("b", 0))
+                    actual_val = {"sum": a ^ b, "carry": a & b}
+                    passed = actual_val == expected
 
             # Test logic simulation for common digital blocks
-            if "sum" in str(expected).lower() or "cout" in str(expected).lower():
+            elif "sum" in str(expected).lower() or "cout" in str(expected).lower():
                 # Adder logic check
                 try:
                     a = int(inp.get("a", 0))
@@ -204,7 +263,32 @@ class VerilogRunner(BaseRunner):
                 rst = inp.get("rst", 0)
                 q_exp = 0 if rst == 1 else d
                 actual_val = {"q": q_exp}
-                passed = True
+                passed = "always" in source and "<=" in source
+                if not passed:
+                    err_msg = "Sequential Verilog should use a clocked always block and nonblocking assignment."
+
+            elif isinstance(inp, dict) and {"a", "b", "sel"}.issubset(inp) and not isinstance(expected, dict):
+                actual_val = inp.get("b") if inp.get("sel") else inp.get("a")
+                passed = actual_val == expected and ("?" in source or "mux" in source)
+                if not passed:
+                    err_msg = "MUX source does not match the documented select behavior."
+
+            elif isinstance(expected, (int, bool)) and isinstance(inp, dict) and "a" in inp:
+                if "not_gate" in source:
+                    actual_val = 0 if int(inp.get("a", 0)) else 1
+                    implemented = bool(re.search(r"not\s*\(\s*y\s*,\s*a\s*\)|assign\s+y\s*=\s*~\s*a", source))
+                elif "and_gate" in source and "b" in inp:
+                    actual_val = int(bool(inp.get("a")) and bool(inp.get("b")))
+                    implemented = bool(re.search(r"and\s*\(\s*y\s*,\s*a\s*,\s*b\s*\)|assign\s+y\s*=\s*a\s*&\s*b", source))
+                elif "or_gate" in source and "b" in inp:
+                    actual_val = int(bool(inp.get("a")) or bool(inp.get("b")))
+                    implemented = bool(re.search(r"or\s*\(\s*y\s*,\s*a\s*,\s*b\s*\)|assign\s+y\s*=\s*a\s*\|\s*b", source))
+                else:
+                    actual_val = expected
+                    implemented = False
+                passed = implemented and actual_val == int(expected)
+                if not passed:
+                    err_msg = "The submitted gate implementation does not match the required truth-table behavior."
 
             tc_results.append(TestCaseResult(
                 test_case_id=tc_id,

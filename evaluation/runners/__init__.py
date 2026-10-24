@@ -7,6 +7,7 @@ from .c_runner import CRunner
 from .python_runner import PythonRunner
 from .ctf_runner import CTFRunner
 from .hardware_runner import HardwareRunner
+from .matlab_runner import MatlabRunner
 
 __all__ = [
     "BaseRunner",
@@ -16,5 +17,6 @@ __all__ = [
     "CRunner",
     "PythonRunner",
     "CTFRunner",
-    "HardwareRunner"
+    "HardwareRunner",
+    "MatlabRunner"
 ]

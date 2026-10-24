@@ -7,6 +7,7 @@ __pycache__/
 *.sqlite3
 .vite/
 .next/
-data/
+/data/
+.test-deps/
 *.log
 .DS_Store

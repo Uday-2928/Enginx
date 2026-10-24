@@ -54,7 +54,13 @@ export const BadgeCollection: React.FC<BadgeCollectionProps> = ({ badges }) => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {badges.map((badge) => (
+        {badges.length === 0 ? (
+          <div className="col-span-full rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-8 text-center">
+            <Award className="mx-auto h-7 w-7 text-teal-600" aria-hidden="true" />
+            <p className="mt-3 text-sm font-semibold text-slate-800">Badge data is not available yet</p>
+            <p className="mt-1 text-xs leading-5 text-slate-600">Complete a verified challenge after the profile service is connected to see earned milestones here.</p>
+          </div>
+        ) : badges.map((badge) => (
           <article
             key={badge.id}
             className={`rounded-2xl border p-5 transition-colors ${

@@ -3,16 +3,16 @@ from sqlalchemy.orm import Session
 from typing import Optional, Dict, Any, List
 from database import get_db
 from models import User, UserProgress, Challenge
+from security import get_current_user
 
 router = APIRouter(prefix="/api/user", tags=["User Progress & Skill Tree"])
 
 @router.get("/progress")
-def get_user_progress(email: Optional[str] = "student@enginx.dev", db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        return {"completed_challenges": [], "progress_map": {}}
-
-    progress_entries = db.query(UserProgress).filter(UserProgress.user_id == user.id).all()
+def get_user_progress(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    progress_entries = db.query(UserProgress).filter(UserProgress.user_id == current_user.id).all()
     progress_map = {}
     completed_ids = []
 
@@ -32,14 +32,13 @@ def get_user_progress(email: Optional[str] = "student@enginx.dev", db: Session =
     }
 
 @router.get("/stats")
-def get_user_stats(email: Optional[str] = "student@enginx.dev", db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        return {"xp": 0, "streak": 0, "completed": 0, "total": 0}
-
+def get_user_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     total_challenges = db.query(Challenge).count()
     completed_count = db.query(UserProgress).filter(
-        UserProgress.user_id == user.id,
+        UserProgress.user_id == current_user.id,
         UserProgress.completed == True
     ).count()
 
@@ -49,7 +48,7 @@ def get_user_stats(email: Optional[str] = "student@enginx.dev", db: Session = De
     for d in disciplines:
         d_total = db.query(Challenge).filter(Challenge.discipline == d).count()
         d_done = db.query(UserProgress).join(Challenge).filter(
-            UserProgress.user_id == user.id,
+            UserProgress.user_id == current_user.id,
             UserProgress.completed == True,
             Challenge.discipline == d
         ).count()
@@ -60,30 +59,31 @@ def get_user_stats(email: Optional[str] = "student@enginx.dev", db: Session = De
         }
 
     return {
-        "user_id": user.id,
-        "name": user.name,
-        "role": user.primary_role,
-        "xp": user.xp,
-        "streak_days": user.streak_days,
+        "user_id": current_user.id,
+        "name": current_user.name,
+        "role": current_user.primary_role,
+        "xp": current_user.xp,
+        "streak_days": current_user.streak_days,
         "completed_count": completed_count,
         "total_challenges": total_challenges,
         "discipline_breakdown": breakdown
     }
 
 @router.get("/skill-tree")
-def get_skill_tree(discipline: Optional[str] = "all", email: Optional[str] = "student@enginx.dev", db: Session = Depends(get_db)):
+def get_skill_tree(
+    discipline: Optional[str] = "all",
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """
     Returns visual skill-tree nodes for graph rendering in the dashboard.
     Nodes have statuses: 'completed' (glow green), 'in_progress' (pulse blue), 'locked' (charcoal).
     """
-    user = db.query(User).filter(User.email == email).first()
-    completed_ids = set()
-    if user:
-        completed = db.query(UserProgress.challenge_id).filter(
-            UserProgress.user_id == user.id,
-            UserProgress.completed == True
-        ).all()
-        completed_ids = {c[0] for c in completed}
+    completed = db.query(UserProgress.challenge_id).filter(
+        UserProgress.user_id == current_user.id,
+        UserProgress.completed == True
+    ).all()
+    completed_ids = {c[0] for c in completed}
 
     query = db.query(Challenge)
     if discipline and discipline.lower() != "all":

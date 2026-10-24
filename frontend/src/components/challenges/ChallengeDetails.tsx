@@ -1,15 +1,25 @@
 import React from 'react';
-import { CheckCircle2, Clock3, FileText, Gauge, Tag } from 'lucide-react';
-import { Challenge } from '../../types';
+import { BookOpen, CheckCircle2, CircleAlert, Clock3, FileText, Gauge, Tag, Terminal } from 'lucide-react';
+import type { Challenge } from '../../types';
 
 interface ChallengeDetailsProps {
   challenge: Challenge;
   isCompleted: boolean;
+  lessonId?: string;
+  lessonCompleted?: boolean;
+  isCompletingLesson?: boolean;
+  lessonError?: string | null;
+  onCompleteLesson?: () => void;
 }
 
 export const ChallengeDetails: React.FC<ChallengeDetailsProps> = ({
   challenge,
   isCompleted,
+  lessonId,
+  lessonCompleted = false,
+  isCompletingLesson = false,
+  lessonError = null,
+  onCompleteLesson,
 }) => {
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-teal-100 bg-white">
@@ -75,10 +85,66 @@ export const ChallengeDetails: React.FC<ChallengeDetailsProps> = ({
             ))}
           </div>
         </div>
+
+        {challenge.execution && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs leading-5 text-amber-950" role="status" aria-label="Execution availability">
+            <div className="flex items-start gap-2">
+              <CircleAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="font-bold">Execution boundary</p>
+                <p className="mt-1 font-semibold">{challenge.execution.runtimeLabel} · {executionStatusLabel(challenge.execution.status)}</p>
+                <p className="mt-1">{challenge.execution.notes}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[11px]">
+                  {challenge.starterVerified && <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 font-semibold text-emerald-800"><Terminal className="h-3 w-3" aria-hidden="true" />Starter syntax verified</span>}
+                  <span className="rounded-full border border-amber-200 bg-white/70 px-2 py-1 font-semibold">Toolboxes: {challenge.execution.requiredToolboxes?.length ? challenge.execution.requiredToolboxes.join(', ') : 'none required'}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {lessonId && onCompleteLesson && (
+          <div className="border-t border-slate-200 pt-4">
+            <div className="flex flex-col gap-3 rounded-xl border border-teal-100 bg-teal-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-3">
+                <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-teal-700" aria-hidden="true" />
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Lesson progress</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                    {lessonCompleted ? 'Saved to your learner profile. You can revisit this lesson any time.' : 'Mark this challenge lesson complete after reviewing the brief.'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => onCompleteLesson()}
+                disabled={lessonCompleted || isCompletingLesson}
+                className="focus-ring inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-lg border border-teal-700 bg-white px-4 text-xs font-bold text-teal-800 transition-colors hover:bg-teal-100 disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-50 disabled:text-emerald-700"
+              >
+                {isCompletingLesson ? (
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-teal-200 border-t-teal-700" aria-hidden="true" />
+                ) : lessonCompleted ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                ) : null}
+                <span>{isCompletingLesson ? 'Saving…' : lessonCompleted ? 'Lesson complete' : 'Mark complete'}</span>
+              </button>
+            </div>
+            {lessonError && <p className="mt-2 text-xs font-semibold text-rose-700" role="alert">{lessonError}</p>}
+          </div>
+        )}
       </div>
     </section>
   );
 };
+
+function executionStatusLabel(status: NonNullable<Challenge['execution']>['status']): string {
+  switch (status) {
+    case 'verified': return 'verified runtime result';
+    case 'unavailable': return 'runtime unavailable';
+    case 'unsupported': return 'unsupported in this evaluator';
+    default: return 'not executed in the browser';
+  }
+}
 
 // The challenge catalogue uses a small, predictable markdown subset. Keeping
 // formatting local lets the details panel stay dependency-free and fast.

@@ -1,21 +1,85 @@
 import httpx
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
 from config import settings
 from models import (
-    Submission, SubmissionCreate, SubmissionResponse,
+    Submission, SubmissionCreate, SubmissionHistoryItem, SubmissionHistoryResponse, SubmissionResponse,
     Challenge, User, UserProgress, Badge, UserBadge
 )
+from security import get_current_user
 
 router = APIRouter(prefix="/api/submissions", tags=["Submissions & Evaluation"])
+
+
+def _unavailable_evaluation(message: str = "Evaluation service unavailable; retry your submission."):
+    """Return a neutral result for an evaluator outage.
+
+    An outage is not a code verdict.  In particular, it must never look like an
+    accepted submission because accepted submissions award progress and XP.
+    """
+
+    return {
+        "verdict": "UNAVAILABLE",
+        "total_time_ms": 0.0,
+        "memory_used_kb": 0.0,
+        "output": message,
+        "test_results": [],
+    }
+
+
+def _history_item(submission: Submission) -> SubmissionHistoryItem:
+    """Expose an attempt without returning its source code."""
+
+    unavailable = submission.verdict in {"UNAVAILABLE", "RETRY"}
+    return SubmissionHistoryItem(
+        id=submission.id,
+        challenge_id=submission.challenge_id,
+        language=submission.language,
+        verdict=submission.verdict,
+        execution_time_ms=float(submission.execution_time_ms or 0.0),
+        memory_used_kb=float(submission.memory_used_kb or 0.0),
+        output=submission.output,
+        test_results=submission.test_results or [],
+        status="unavailable" if unavailable else "evaluated",
+        retryable=unavailable,
+        created_at=submission.created_at,
+    )
+
+
+@router.get("/history", response_model=SubmissionHistoryResponse)
+def get_submission_history(
+    challenge_id: Optional[str] = Query(default=None, max_length=100),
+    limit: int = Query(default=20, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return recent attempts for the current learner, newest first.
+
+    History is deliberately scoped by the bearer-authenticated user and does
+    not expose submitted source code.  A challenge filter keeps the editor
+    panel small while still allowing a future learner-history view to request
+    all attempts.
+    """
+
+    query = db.query(Submission).filter(Submission.user_id == current_user.id)
+    if challenge_id:
+        query = query.filter(Submission.challenge_id == challenge_id)
+
+    submissions = query.order_by(
+        Submission.created_at.desc(),
+        Submission.id.desc(),
+    ).limit(limit).all()
+
+    return {"items": [_history_item(submission) for submission in submissions]}
 
 @router.post("", response_model=SubmissionResponse)
 async def submit_solution(
     req: SubmissionCreate,
-    user_email: str = "student@enginx.dev",
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     # 1. Fetch challenge
@@ -23,13 +87,9 @@ async def submit_solution(
     if not challenge:
         raise HTTPException(status_code=404, detail="Challenge not found")
 
-    # 2. Fetch or create user
-    user = db.query(User).filter(User.email == user_email).first()
-    if not user:
-        user = User(email=user_email, name="Student", primary_role="CSE", xp=0)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+    # 2. The bearer token is the only source of submission ownership.  Legacy
+    # query parameters such as ``user_email`` are intentionally ignored.
+    user = current_user
 
     # 3. Call Evaluation Microservice
     eval_payload = {
@@ -41,11 +101,19 @@ async def submit_solution(
     }
 
     eval_result = None
+    evaluation_status = "evaluated"
+    retryable = False
     try:
         async with httpx.AsyncClient(timeout=15.0) as client:
             resp = await client.post(settings.EVALUATION_SERVICE_URL, json=eval_payload)
             if resp.status_code == 200:
                 eval_result = resp.json()
+            elif resp.status_code >= 500 or resp.status_code in (408, 429):
+                eval_result = _unavailable_evaluation(
+                    f"Evaluation service returned HTTP {resp.status_code}; retry your submission."
+                )
+                evaluation_status = "unavailable"
+                retryable = True
             else:
                 eval_result = {
                     "verdict": "RE",
@@ -54,30 +122,23 @@ async def submit_solution(
                     "output": f"Evaluator returned {resp.status_code}: {resp.text}",
                     "test_results": []
                 }
-    except Exception as e:
-        # Fallback evaluation simulation if standalone
-        eval_result = {
-            "verdict": "AC",
-            "total_time_ms": 12.5,
-            "memory_used_kb": 1024.0,
-            "output": f"Evaluated (Standalone mode): All {len(challenge.test_cases)} tests passed.",
-            "test_results": [
-                {
-                    "test_case_id": tc.get("id", str(i+1)),
-                    "passed": True,
-                    "input": tc.get("input"),
-                    "expected": tc.get("expected"),
-                    "actual": tc.get("expected"),
-                    "execution_time_ms": 2.5
-                } for i, tc in enumerate(challenge.test_cases)
-            ]
-        }
+    except Exception:
+        # A missing evaluator is an infrastructure state, not a passing result.
+        # Keep the exception detail out of the API response because it can contain
+        # internal URLs or connection information.
+        eval_result = _unavailable_evaluation()
+        evaluation_status = "unavailable"
+        retryable = True
 
     verdict = eval_result.get("verdict", "WA")
     duration = eval_result.get("total_time_ms", 0.0)
     memory = eval_result.get("memory_used_kb", 0.0)
     output = eval_result.get("output", "")
     test_results = eval_result.get("test_results", [])
+
+    if verdict in {"UNAVAILABLE", "RETRY"}:
+        evaluation_status = "unavailable"
+        retryable = True
 
     # 4. Save Submission
     sub = Submission(
@@ -93,6 +154,28 @@ async def submit_solution(
         test_results=test_results
     )
     db.add(sub)
+
+    if verdict in {"UNAVAILABLE", "RETRY"}:
+        # Do not create progress, award XP, or unlock badges for an unevaluated
+        # submission.  Persisting the attempt keeps the result auditable and lets
+        # callers retry without losing the submission record.
+        db.commit()
+        db.refresh(sub)
+        return SubmissionResponse(
+            id=sub.id,
+            challenge_id=sub.challenge_id,
+            language=sub.language,
+            verdict=sub.verdict,
+            execution_time_ms=sub.execution_time_ms,
+            memory_used_kb=sub.memory_used_kb,
+            output=sub.output,
+            test_results=sub.test_results or [],
+            xp_awarded=0,
+            new_badges=[],
+            status=evaluation_status,
+            retryable=retryable,
+            created_at=sub.created_at,
+        )
 
     # 5. Handle Progress & XP
     xp_earned = 0
@@ -170,5 +253,7 @@ async def submit_solution(
         test_results=sub.test_results or [],
         xp_awarded=xp_earned,
         new_badges=new_badges,
+        status=evaluation_status,
+        retryable=retryable,
         created_at=sub.created_at
     )
