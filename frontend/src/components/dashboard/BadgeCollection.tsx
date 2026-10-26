@@ -34,43 +34,40 @@ export const BadgeCollection: React.FC<BadgeCollectionProps> = ({ badges }) => {
 
   return (
     <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 border-b border-teal-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800">
-            <Award className="h-3.5 w-3.5" aria-hidden="true" />
-            Progress milestones
-          </span>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900">Badges &amp; achievements</h1>
+          <p className="eyebrow">Milestones</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Badges</h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            Proof of engineering practice unlocked across compiler, synthesis, embedded, and CTF challenges.
+            Badges awarded for verified challenge milestones.
           </p>
         </div>
-        <div className="flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 sm:self-auto">
+        <div className="flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 sm:self-auto">
           <span>Unlocked</span>
-          <span className="text-enginx-primary">{earnedCount}</span>
+          <span className="tabular-nums text-enginx-primary">{earnedCount}</span>
           <span className="text-slate-300">/</span>
-          <span>{badges.length}</span>
+          <span className="tabular-nums">{badges.length}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {badges.length === 0 ? (
-          <div className="col-span-full rounded-2xl border border-dashed border-teal-200 bg-teal-50/50 p-8 text-center">
-            <Award className="mx-auto h-7 w-7 text-teal-600" aria-hidden="true" />
+          <div className="col-span-full rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center">
+            <Award className="mx-auto h-7 w-7 text-slate-300" aria-hidden="true" />
             <p className="mt-3 text-sm font-semibold text-slate-800">Badge data is not available yet</p>
             <p className="mt-1 text-xs leading-5 text-slate-600">Complete a verified challenge after the profile service is connected to see earned milestones here.</p>
           </div>
         ) : badges.map((badge) => (
           <article
             key={badge.id}
-            className={`rounded-2xl border p-5 transition-colors ${
+            className={`surface-card p-5 transition-colors ${
               badge.earned
-                ? 'border-teal-200 bg-white hover:border-teal-400'
-                : 'border-slate-200 bg-slate-50'
+                ? 'hover:border-teal-300'
+                : ''
             }`}
           >
             <div className="flex items-start gap-4">
-              <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border ${
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border ${
                 badge.earned
                   ? 'border-teal-200 bg-teal-50'
                   : 'border-slate-200 bg-white'
@@ -80,7 +77,7 @@ export const BadgeCollection: React.FC<BadgeCollectionProps> = ({ badges }) => {
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                  <h2 className={`truncate text-sm font-bold ${badge.earned ? 'text-slate-900' : 'text-slate-500'}`}>
+                  <h2 className={`truncate text-sm font-semibold ${badge.earned ? 'text-slate-900' : 'text-slate-500'}`}>
                     {badge.name}
                   </h2>
                   {badge.earned ? (
@@ -98,7 +95,7 @@ export const BadgeCollection: React.FC<BadgeCollectionProps> = ({ badges }) => {
                 <p className="mt-2 text-xs leading-5 text-slate-600">{badge.description}</p>
                 <div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-200 pt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                   <span>Track: {badge.discipline}</span>
-                  <span className="font-mono normal-case tracking-normal text-teal-800">+{badge.xp_bonus} XP</span>
+                  <span className="tabular-nums normal-case tracking-normal text-teal-800">+{badge.xp_bonus} XP</span>
                 </div>
               </div>
             </div>

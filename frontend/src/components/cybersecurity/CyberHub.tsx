@@ -1,35 +1,18 @@
 import React, { useState } from 'react';
 import {
   Activity,
+  ArrowLeft,
+  ArrowRight,
   Award,
   BookOpen,
-  CheckCircle2,
   ChevronRight,
-  Code2,
-  Cpu,
+  ExternalLink,
   FlaskConical,
   LayoutDashboard,
   Library,
-  Map as MapIcon,
   ShieldCheck,
   Trophy,
-  ArrowRight,
-  Settings2,
-  Save,
   X,
-  CircleAlert,
-  Timer,
-  Play,
-  Zap,
-  Lock,
-  Unlock,
-  Key,
-  Terminal,
-  ExternalLink,
-  ChevronDown,
-  Info,
-  Check,
-  AlertTriangle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type {
@@ -50,6 +33,7 @@ import {
 } from '../../data/cyberHub';
 import { PasswordStrengthLab } from './PasswordStrengthLab';
 import { BruteForceSimulator } from './BruteForceSimulator';
+import { TutorialCodeBlock } from '../tutorials/TutorialCodeBlock';
 
 interface CyberHubProps {
   user: User | null;
@@ -70,6 +54,21 @@ const ICONS: Record<string, LucideIcon> = {
   chart: Activity,
   library: Library,
 };
+
+// Outlined pill tones: easy/beginner levels emerald, medium/intermediate amber,
+// hard/advanced rose. Anything else falls back to neutral slate.
+const TONE_PILL_STYLES: Record<string, string> = {
+  foundation: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  beginner: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  easy: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  intermediate: 'border-amber-200 bg-amber-50 text-amber-800',
+  medium: 'border-amber-200 bg-amber-50 text-amber-800',
+  advanced: 'border-rose-200 bg-rose-50 text-rose-700',
+  hard: 'border-rose-200 bg-rose-50 text-rose-700',
+};
+
+const tonePill = (value: string): string =>
+  TONE_PILL_STYLES[value.toLowerCase()] ?? 'border-slate-200 bg-slate-50 text-slate-600';
 
 export const CyberHub: React.FC<CyberHubProps> = ({
   user,
@@ -105,7 +104,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
 
   const handleCheckLessonAnswer = (checkAnswer: string) => {
     if (lessonAnswerInput.trim().toLowerCase() === checkAnswer.trim().toLowerCase()) {
-      setLessonFeedback({ correct: true, message: 'Correct! Well done.' });
+      setLessonFeedback({ correct: true, message: 'Correct.' });
       if (selectedLesson) {
         handleLessonComplete(selectedLesson.id);
       }
@@ -117,14 +116,14 @@ export const CyberHub: React.FC<CyberHubProps> = ({
   const handleCTFSubmit = (expectedFlag?: string) => {
     if (!expectedFlag) return;
     if (userFlagInput.trim() === expectedFlag.trim()) {
-      setCtfResult({ success: true, message: 'Flag captured! +XP awarded to your profile.' });
+      setCtfResult({ success: true, message: 'Flag accepted. +XP recorded.' });
     } else {
-      setCtfResult({ success: false, message: 'Incorrect flag format or value. Keep hunting!' });
+      setCtfResult({ success: false, message: 'Flag rejected. Check the ENGINX{...} format and value.' });
     }
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4.5rem)] bg-slate-50">
+    <div className="flex min-h-[calc(100vh-4.5rem)]">
       {/* Sidebar Navigation */}
       <aside className={`${collapsed ? 'w-[4.5rem]' : 'w-72'} hidden shrink-0 border-r border-slate-200 bg-white transition-[width] duration-200 lg:block`}>
         <div className="sticky top-[4.5rem] flex h-[calc(100vh-4.5rem)] flex-col">
@@ -132,13 +131,13 @@ export const CyberHub: React.FC<CyberHubProps> = ({
             {!collapsed && (
               <div className="min-w-0 px-2">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-teal-600">EnginX Defense</p>
-                <p className="truncate text-sm font-extrabold text-slate-900">Cyber Hub</p>
+                <p className="truncate text-sm font-semibold tracking-tight text-slate-900">Cyber Hub</p>
               </div>
             )}
             <button
               type="button"
               onClick={() => setCollapsed(!collapsed)}
-              className="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50"
+              className="focus-ring flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-slate-500 hover:bg-slate-50"
             >
               {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronRight className="h-4 w-4 rotate-180" />}
             </button>
@@ -157,8 +156,8 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                     setSelectedLab(null);
                     setSelectedCTF(null);
                   }}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors ${
-                    active ? 'bg-teal-50 text-teal-900 font-bold' : 'text-slate-600 hover:bg-slate-50'
+                  className={`focus-ring flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-colors ${
+                    active ? 'bg-teal-50 text-teal-800' : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
                   <Icon className={`h-4 w-4 ${active ? 'text-teal-700' : 'text-slate-400'}`} />
@@ -173,16 +172,17 @@ export const CyberHub: React.FC<CyberHubProps> = ({
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto p-6">
         <div className="mx-auto max-w-6xl space-y-6">
-          {/* Header Banner */}
-          <header className="rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-900 via-slate-900 to-slate-900 p-6 text-white shadow-md">
-            <div className="flex items-center gap-3">
-              <ShieldCheck className="h-8 w-8 text-teal-400" />
-              <div>
-                <h1 className="text-2xl font-extrabold tracking-tight">Cybersecurity & Ethical Hacking Hub</h1>
-                <p className="mt-1 text-xs text-teal-200">
-                  Defensive engineering, OWASP security, cryptography & offensive CTF methodology.
-                </p>
-              </div>
+          {/* Header */}
+          <header className="flex flex-wrap items-center gap-4">
+            <div className="icon-chip">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <p className="eyebrow">Cyber range</p>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Cyber Hub</h1>
+              <p className="mt-1 text-sm text-slate-600">
+                Courses, browser labs and CTF challenges for defensive engineering.
+              </p>
             </div>
           </header>
 
@@ -190,33 +190,35 @@ export const CyberHub: React.FC<CyberHubProps> = ({
 
           {/* Lesson View */}
           {selectedLesson && (
-            <div className="space-y-6 rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+            <div className="surface-card space-y-6 p-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <span className="rounded-md bg-teal-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-teal-700">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(selectedLesson.level)}`}>
                     {selectedLesson.level} · {selectedLesson.duration_minutes || selectedLesson.durationMinutes || 30} mins
                   </span>
-                  <h2 className="mt-2 text-xl font-bold text-slate-900">{selectedLesson.title}</h2>
+                  <h2 className="mt-2 text-lg font-semibold text-slate-900">{selectedLesson.title}</h2>
                 </div>
                 <button
                   onClick={() => setSelectedLesson(null)}
-                  className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
+                  className="focus-ring rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="prose prose-slate max-w-none text-sm text-slate-700 leading-relaxed">
+              <div className="text-sm text-slate-700 leading-relaxed">
                 <p className="font-semibold text-slate-900">{selectedLesson.summary}</p>
                 <div className="mt-4 rounded-xl bg-slate-50 p-4 border border-slate-100">
                   <h4 className="text-xs font-bold uppercase text-slate-500 mb-2">Lesson Material</h4>
                   <p className="whitespace-pre-wrap">{selectedLesson.body}</p>
                 </div>
 
-                {selectedLesson.code_sample || selectedLesson.codeSample && (
-                  <div className="mt-4 rounded-xl bg-slate-900 p-4 text-slate-100 font-mono text-xs overflow-x-auto">
-                    <div className="text-slate-400 text-[10px] uppercase tracking-wider mb-2">// Code Example / Artifact</div>
-                    <pre>{selectedLesson.code_sample || selectedLesson.codeSample}</pre>
+                {(selectedLesson.code_sample || selectedLesson.codeSample) && (
+                  <div className="mt-4">
+                    <TutorialCodeBlock
+                      code={selectedLesson.code_sample || selectedLesson.codeSample || ''}
+                      language={selectedLesson.id.startsWith('cyber-lin') ? 'text' : 'python'}
+                    />
                   </div>
                 )}
 
@@ -247,7 +249,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                       />
                       <button
                         onClick={() => handleCheckLessonAnswer(selectedLesson.check?.answer || selectedLesson.assessment?.answer || '')}
-                        className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700"
+                        className="focus-ring btn-primary"
                       >
                         Verify
                       </button>
@@ -273,15 +275,16 @@ export const CyberHub: React.FC<CyberHubProps> = ({
             <div className="space-y-4">
               <button
                 onClick={() => setSelectedLab(null)}
-                className="flex items-center gap-1 text-xs font-bold text-teal-600 hover:text-teal-700"
+                className="focus-ring inline-flex min-h-[44px] items-center gap-2 rounded-lg text-xs font-semibold text-teal-600 hover:text-teal-700"
               >
-                ← Back to Labs
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Back to labs
               </button>
               {selectedLab.id === 'lab-password-strength' && <PasswordStrengthLab />}
               {selectedLab.id === 'lab-hash-cracker' && <BruteForceSimulator />}
               {selectedLab.id !== 'lab-password-strength' && selectedLab.id !== 'lab-hash-cracker' && (
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-lg font-bold text-slate-900">{selectedLab.title}</h3>
+                <div className="surface-card p-6">
+                  <h3 className="text-lg font-semibold text-slate-900">{selectedLab.title}</h3>
                   <p className="mt-2 text-xs text-slate-600">{selectedLab.summary}</p>
                   <div className="mt-4 rounded-xl bg-slate-50 p-4 border border-slate-100">
                     <h4 className="text-xs font-bold text-slate-700 uppercase mb-2">Objectives</h4>
@@ -298,17 +301,17 @@ export const CyberHub: React.FC<CyberHubProps> = ({
 
           {/* CTF Challenge View */}
           {selectedCTF && (
-            <div className="space-y-6 rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+            <div className="surface-card space-y-6 p-6">
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <span className="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(selectedCTF.difficulty)}`}>
                     {selectedCTF.category} · {selectedCTF.difficulty}
                   </span>
-                  <h2 className="mt-2 text-xl font-bold text-slate-900">{selectedCTF.title}</h2>
+                  <h2 className="mt-2 text-lg font-semibold text-slate-900">{selectedCTF.title}</h2>
                 </div>
                 <button
                   onClick={() => setSelectedCTF(null)}
-                  className="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
+                  className="focus-ring rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-50"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -324,7 +327,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                   <div className="rounded-xl bg-amber-50 p-4 border border-amber-100 text-xs text-amber-900">
                     <h4 className="font-bold uppercase text-amber-800 mb-1">Hints</h4>
                     <ul className="list-disc list-inside space-y-1">
-                      {selectedCTF.hints.map((hint, i) => (
+                      {selectedCTF.hints.map((hint: string, i: number) => (
                         <li key={i}>{hint}</li>
                       ))}
                     </ul>
@@ -343,8 +346,8 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                       className="flex-1 rounded-lg border border-teal-200 px-3 py-2 text-xs font-mono"
                     />
                     <button
-                      onClick={() => handleCTFSubmit(selectedCTF.flag)}
-                      className="rounded-lg bg-teal-600 px-4 py-2 text-xs font-bold text-white hover:bg-teal-700"
+                      onClick={() => handleCTFSubmit(selectedCTF.flag || '')}
+                      className="focus-ring btn-primary"
                     >
                       Submit
                     </button>
@@ -363,37 +366,37 @@ export const CyberHub: React.FC<CyberHubProps> = ({
           {activeSection === 'dashboard' && !selectedLesson && !selectedLab && !selectedCTF && (
             <div className="space-y-6">
               <div className="grid gap-6 md:grid-cols-3">
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Curriculum Progress</h3>
-                  <p className="mt-2 text-2xl font-extrabold text-slate-900">{progress?.completion_percentage || 0}%</p>
-                  <div className="mt-3 h-2 w-full rounded-full bg-slate-100">
-                    <div className="h-2 rounded-full bg-teal-500" style={{ width: `${progress?.completion_percentage || 0}%` }} />
+                <div className="surface-card p-6">
+                  <h3 className="eyebrow">Curriculum Progress</h3>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">{progress?.completion_percentage || 0}%</p>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div className="h-full rounded-full bg-teal-600 transition-[width]" style={{ width: `${progress?.completion_percentage || 0}%` }} />
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">CTF Challenges</h3>
-                  <p className="mt-2 text-2xl font-extrabold text-slate-900">{displayCTFs.length} Available</p>
+                <div className="surface-card p-6">
+                  <h3 className="eyebrow">CTF Challenges</h3>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">{displayCTFs.length} Available</p>
                   <p className="mt-1 text-xs text-slate-500">Across 4 domain categories</p>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Interactive Labs</h3>
-                  <p className="mt-2 text-2xl font-extrabold text-slate-900">{displayLabs.length} Labs</p>
-                  <p className="mt-1 text-xs text-slate-500">100% browser-isolated</p>
+                <div className="surface-card p-6">
+                  <h3 className="eyebrow">Interactive Labs</h3>
+                  <p className="mt-2 text-2xl font-semibold tabular-nums text-slate-900">{displayLabs.length} Labs</p>
+                  <p className="mt-1 text-xs text-slate-500">Runs in a browser sandbox</p>
                 </div>
               </div>
 
               {/* Quick Course Pickers */}
               <div className="space-y-4">
-                <h3 className="text-lg font-bold text-slate-900">Featured Learning Paths</h3>
+                <h3 className="text-lg font-semibold text-slate-900">Courses</h3>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {displayCourses.slice(0, 3).map((course) => (
-                    <article key={course.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                      <span className="rounded-md bg-teal-50 px-2 py-1 text-[10px] font-bold uppercase text-teal-700">
+                    <article key={course.id} className="surface-card p-5">
+                      <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(course.level)}`}>
                         {course.level}
                       </span>
-                      <h4 className="mt-3 font-bold text-slate-900">{course.title}</h4>
+                      <h4 className="mt-3 text-base font-semibold text-slate-900">{course.title}</h4>
                       <p className="mt-2 text-xs text-slate-600 line-clamp-2">{course.summary}</p>
                       <button
                         onClick={() => {
@@ -402,9 +405,9 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                             setSelectedLesson(course.lessons[0] as CybersecurityLesson);
                           }
                         }}
-                        className="mt-4 flex w-full items-center justify-center gap-1 rounded-lg bg-teal-600 px-3 py-2 text-xs font-bold text-white hover:bg-teal-700"
+                        className="focus-ring btn-secondary mt-4 w-full"
                       >
-                        Start Learning <ArrowRight className="h-3.5 w-3.5" />
+                        Open course <ArrowRight className="h-3.5 w-3.5" />
                       </button>
                     </article>
                   ))}
@@ -417,14 +420,14 @@ export const CyberHub: React.FC<CyberHubProps> = ({
           {activeSection === 'courses' && !selectedLesson && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {displayCourses.map((course) => (
-                <article key={course.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+                <article key={course.id} className="surface-card space-y-3 p-5">
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-teal-50 px-2 py-1 text-[10px] font-bold uppercase text-teal-700">
+                    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(course.level)}`}>
                       {course.level}
                     </span>
-                    <span className="text-xs font-bold text-slate-400">{course.estimatedHours || 6}h</span>
+                    <span className="text-xs font-bold tabular-nums text-slate-400">{(course.estimatedHours ?? 6)}h</span>
                   </div>
-                  <h4 className="font-bold text-slate-900">{course.title}</h4>
+                  <h4 className="text-base font-semibold text-slate-900">{course.title}</h4>
                   <p className="text-xs text-slate-600 leading-relaxed">{course.summary}</p>
 
                   {course.lessons && course.lessons.length > 0 && (
@@ -434,7 +437,7 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                         <button
                           key={lesson.id}
                           onClick={() => setSelectedLesson(lesson as CybersecurityLesson)}
-                          className="flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50 text-left"
+                          className="focus-ring flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-xs text-slate-700 hover:bg-slate-50 text-left"
                         >
                           <span className="truncate">{lesson.title}</span>
                           <ChevronRight className="h-3 w-3 text-slate-400 shrink-0" />
@@ -451,15 +454,15 @@ export const CyberHub: React.FC<CyberHubProps> = ({
           {activeSection === 'labs' && !selectedLab && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {displayLabs.map((lab) => (
-                <article key={lab.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
-                  <span className="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase text-amber-700">
+                <article key={lab.id} className="surface-card space-y-3 p-5">
+                  <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(lab.difficulty)}`}>
                     {lab.difficulty}
                   </span>
-                  <h4 className="font-bold text-slate-900">{lab.title}</h4>
+                  <h4 className="text-base font-semibold text-slate-900">{lab.title}</h4>
                   <p className="text-xs text-slate-600">{lab.summary}</p>
                   <button
                     onClick={() => setSelectedLab(lab)}
-                    className="mt-4 w-full rounded-lg bg-teal-600 px-3 py-2 text-xs font-bold text-white hover:bg-teal-700"
+                    className="focus-ring btn-secondary mt-4 w-full"
                   >
                     Launch Lab
                   </button>
@@ -472,18 +475,18 @@ export const CyberHub: React.FC<CyberHubProps> = ({
           {activeSection === 'ctf' && !selectedCTF && (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {displayCTFs.map((challenge) => (
-                <article key={challenge.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-3">
+                <article key={challenge.id} className="surface-card space-y-3 p-5">
                   <div className="flex items-center justify-between">
-                    <span className="rounded-md bg-amber-50 px-2 py-1 text-[10px] font-bold uppercase text-amber-700">
+                    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tonePill(challenge.difficulty)}`}>
                       {challenge.category} · {challenge.difficulty}
                     </span>
-                    <span className="text-xs font-bold text-teal-600">+{challenge.xpReward || 50} XP</span>
+                    <span className="text-xs font-bold tabular-nums text-teal-600">+{(challenge.xpReward ?? 50)} XP</span>
                   </div>
-                  <h4 className="font-bold text-slate-900">{challenge.title}</h4>
+                  <h4 className="text-base font-semibold text-slate-900">{challenge.title}</h4>
                   <p className="text-xs text-slate-600">{challenge.summary}</p>
                   <button
                     onClick={() => setSelectedCTF(challenge)}
-                    className="mt-4 w-full rounded-lg bg-teal-600 px-3 py-2 text-xs font-bold text-white hover:bg-teal-700"
+                    className="focus-ring btn-secondary mt-4 w-full"
                   >
                     Attempt Challenge
                   </button>
@@ -495,8 +498,8 @@ export const CyberHub: React.FC<CyberHubProps> = ({
           {/* Section: Progress & Badges */}
           {activeSection === 'progress' && (
             <div className="space-y-6">
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h3 className="text-lg font-bold text-slate-900 mb-4">Badges & Achievements</h3>
+              <div className="surface-card p-6">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Badges & Achievements</h3>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {CYBER_BADGES.map((badge) => (
                     <div key={badge.id} className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4">
@@ -521,13 +524,13 @@ export const CyberHub: React.FC<CyberHubProps> = ({
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:border-teal-300 transition-colors block"
+                  className="focus-ring surface-card p-5 hover:border-teal-300 transition-colors block"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase text-teal-600">{resource.provider}</span>
                     <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <h4 className="mt-2 font-bold text-slate-900">{resource.title}</h4>
+                  <h4 className="mt-2 text-base font-semibold text-slate-900">{resource.title}</h4>
                   <p className="mt-1 text-xs text-slate-600">{resource.note}</p>
                 </a>
               ))}

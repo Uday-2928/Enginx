@@ -65,7 +65,7 @@ from models import (
     UserBadge,
     UserProgress,
 )
-from security import get_current_user
+from security import get_current_user, get_optional_current_user
 
 
 router = APIRouter(prefix="/api/cybersecurity", tags=["Cybersecurity Hub"])
@@ -846,7 +846,7 @@ def _course_card(
         summary=course["summary"],
         topics=course["topics"],
         lesson_count=len(course["lessons"]),
-        xp_reward=course["xp_reward"],
+        xp_reward=course.get("xp_reward", sum(l.get("xp_reward", 25) for l in course.get("lessons", []))),
         lessons=_lesson_summaries(course, completed_ids) if with_lessons else None,
     )
 
@@ -864,7 +864,7 @@ def _all_lessons() -> List[Dict[str, Any]]:
             enriched = dict(lesson)
             enriched["course_id"] = course["id"]
             enriched["course_title"] = course["title"]
-            enriched["xp_reward"] = course["xp_reward"]
+            enriched["xp_reward"] = lesson.get("xp_reward", course.get("xp_reward", 25))
             enriched.setdefault("level", course["level"])
             lessons.append(enriched)
     return lessons
@@ -1048,7 +1048,7 @@ def list_ctf_challenges(
     difficulty: Optional[str] = Query(default=None, description="Filter by difficulty: Easy, Medium, Hard"),
     category: Optional[str] = Query(default=None, description="Filter by category: Web, Cryptography"),
     limit: int = Query(default=50, ge=1, le=100),
-    current_user: Optional[User] = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
 ):
     """List CTF challenges.
@@ -1097,6 +1097,7 @@ def get_progress(
     for course in _COURSE_CATALOGUE:
         course_ids = [lesson["id"] for lesson in course["lessons"]]
         course_done = len(completed_ids & set(course_ids))
+        course_xp = course.get("xp_reward", sum(l.get("xp_reward", 25) for l in course.get("lessons", [])))
         courses.append(
             {
                 "id": course["id"],
@@ -1107,7 +1108,7 @@ def get_progress(
                 "completion_percentage": round(course_done / len(course_ids) * 100, 1)
                 if course_ids
                 else 0.0,
-                "xp_awarded": course["xp_reward"] if course_done == len(course_ids) else 0,
+                "xp_awarded": course_xp if course_done == len(course_ids) else 0,
                 "lessons": [
                     {
                         "id": lesson["id"],
@@ -1155,7 +1156,7 @@ def get_stats(
         done_here = len(completed_ids & set(course_ids))
         completed_by_course[course["id"]] = done_here
         if done_here == len(course_ids) and course_ids:
-            xp_from_courses += course["xp_reward"]
+            xp_from_courses += course.get("xp_reward", sum(l.get("xp_reward", 25) for l in course.get("lessons", [])))
         for lesson in course["lessons"]:
             if lesson["id"] in completed_ids:
                 level = lesson.get("level", course["level"])

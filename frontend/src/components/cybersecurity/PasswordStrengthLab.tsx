@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Zap, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const PasswordStrengthLab: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -60,39 +60,34 @@ export const PasswordStrengthLab: React.FC = () => {
   }, [password]);
 
   return (
-    <div className="space-y-6 rounded-2xl border border-teal-100 bg-white p-6 shadow-sm">
+    <div className="surface-card space-y-6 p-6">
       <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-        <div className="rounded-xl bg-teal-50 p-2 text-teal-600">
-          <ShieldCheck className="h-6 w-6" />
+        <div className="icon-chip">
+          <ShieldCheck className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-lg font-extrabold text-slate-900">Password Strength Analyzer</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Password Strength Analyzer</h2>
           <p className="text-xs text-slate-500">Measure entropy and complexity in real-time.</p>
         </div>
       </div>
 
       <div className="space-y-4">
-        <div className="relative">
-          <input
-            type="text"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="focus-ring block w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-sm placeholder:font-sans placeholder:text-slate-400"
-            placeholder="Type a password to test..."
-          />
-          <div className="absolute right-4 top-1/2 -translate-y-1/2">
-            <Zap className={`h-4 w-4 ${password ? 'text-amber-500' : 'text-slate-300'}`} />
-          </div>
-        </div>
+        <input
+          type="text"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="focus-ring block w-full rounded-lg border border-slate-200 bg-white px-4 py-3 font-mono text-sm placeholder:font-sans placeholder:text-slate-400"
+          placeholder="Type a password to test..."
+        />
 
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-slate-600">Estimated Entropy</span>
+            <span className="text-slate-600">Strength</span>
             <span className="text-slate-900">{strength.feedback}</span>
           </div>
           <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
             <div
-              className={`h-full transition-all duration-500 ${strength.color}`}
+              className={`h-full transition-all duration-300 ${strength.color}`}
               style={{ width: `${strength.score}%` }}
             />
           </div>
@@ -114,10 +109,10 @@ export const PasswordStrengthLab: React.FC = () => {
         </div>
 
         <div className="rounded-xl bg-amber-50 p-4 border border-amber-100">
-          <p className="text-[11px] font-bold uppercase tracking-wider text-amber-800">Security Tip</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-amber-800">Security tip</p>
           <p className="mt-1 text-xs leading-5 text-amber-900">
-            Complexity (numbers, symbols) is good, but **length is better**.
-            A long phrase like "correct-horse-battery-staple" is often harder to crack than "P4ssw0rd!".
+            Length beats complexity. A long phrase like correct-horse-battery-staple is often
+            harder to crack than a short password padded with symbols and numbers.
           </p>
         </div>
       </div>

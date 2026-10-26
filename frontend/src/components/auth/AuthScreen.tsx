@@ -97,14 +97,14 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthenticated }) => {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-enginx-canvas px-4 py-8 text-slate-900 sm:px-6">
-      <section className="w-full max-w-md rounded-2xl border border-teal-100 bg-white p-5 shadow-sm sm:p-7" aria-labelledby="auth-title">
+      <section className="surface-card w-full max-w-md p-5 sm:p-7" aria-labelledby="auth-title">
         <div className="text-center">
           <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl border border-teal-200 bg-teal-50 text-enginx-primary">
             <Cpu className="h-6 w-6" aria-hidden="true" />
           </span>
-          <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-teal-700">EnginX learner portal</p>
-          <h1 id="auth-title" className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">
-            {isSignup ? 'Create your learner account' : 'Welcome back, engineer'}
+          <p className="eyebrow mt-4">EnginX</p>
+          <h1 id="auth-title" className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
+            {isSignup ? 'Create your account' : 'Sign in to EnginX'}
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             {isSignup ? 'Save your roadmap, verified progress, and challenge history.' : 'Sign in to access your saved engineering workspace.'}
@@ -117,7 +117,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthenticated }) => {
             role="tab"
             aria-selected={!isSignup}
             onClick={() => switchMode('login')}
-            className={`focus-ring min-h-[42px] rounded-lg text-sm font-bold transition-colors ${!isSignup ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`focus-ring min-h-[42px] rounded-lg text-sm font-bold transition-colors ${!isSignup ? 'bg-white text-teal-800 ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800'}`}
           >
             Sign in
           </button>
@@ -126,7 +126,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthenticated }) => {
             role="tab"
             aria-selected={isSignup}
             onClick={() => switchMode('signup')}
-            className={`focus-ring min-h-[42px] rounded-lg text-sm font-bold transition-colors ${isSignup ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+            className={`focus-ring min-h-[42px] rounded-lg text-sm font-bold transition-colors ${isSignup ? 'bg-white text-teal-800 ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-800'}`}
           >
             Create account
           </button>
@@ -207,7 +207,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ onAuthenticated }) => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="btn-charge focus-ring flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl border border-enginx-cta bg-enginx-cta px-4 text-sm font-bold text-white hover:border-amber-700 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="btn-charge focus-ring flex min-h-[44px] w-full items-center justify-center gap-2 rounded-lg border border-enginx-cta bg-enginx-cta px-4 text-sm font-semibold text-white hover:border-amber-700 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true" /> : <ArrowRight className="h-4 w-4" aria-hidden="true" />}
             <span>{isSignup ? 'Create account' : 'Sign in'}</span>

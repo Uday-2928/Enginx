@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Medal, Trophy, Users } from 'lucide-react';
+import { Flame, Medal, Trophy } from 'lucide-react';
 import type { LeaderboardEntry } from '../../types';
 
 interface LeaderboardProps {
@@ -10,32 +10,29 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries = [] }) => {
   const rankDisplay = (rank: number) => {
     if (rank === 1) return <Medal className="h-4 w-4 text-amber-600" aria-hidden="true" />;
     if (rank === 2) return <Medal className="h-4 w-4 text-slate-500" aria-hidden="true" />;
-    if (rank === 3) return <Medal className="h-4 w-4 text-orange-700" aria-hidden="true" />;
+    if (rank === 3) return <Medal className="h-4 w-4 text-amber-700" aria-hidden="true" />;
     return <span className="w-4 text-center text-slate-500">{rank}</span>;
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 border-b border-teal-100 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800">
-            <Users className="h-3.5 w-3.5" aria-hidden="true" />
-            Community momentum
-          </span>
-          <h1 className="mt-3 flex items-center gap-2 text-3xl font-extrabold tracking-tight text-slate-900">
-            Engineering leaderboard
+          <p className="eyebrow">Rankings</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            Leaderboard
           </h1>
           <p className="mt-2 text-sm leading-6 text-slate-600">
-            See how learners are progressing through verified submissions, hardware simulations, and discipline badges.
+            Rankings are computed from backend-verified submissions.
           </p>
         </div>
-        <div className="flex items-center gap-2 self-start rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 sm:self-auto">
-          <Trophy className="h-4 w-4 text-enginx-cta" aria-hidden="true" />
-          <span>Monthly rankings</span>
+        <div className="flex items-center gap-2 self-start rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 sm:self-auto">
+          <Trophy className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          <span>Verified submissions</span>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-teal-100 bg-white">
+      <div className="surface-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[680px] border-collapse text-left text-sm">
             <caption className="sr-only">Global engineering leaderboard</caption>
@@ -53,7 +50,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries = [] }) => {
               {entries.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center">
-                    <Trophy className="mx-auto h-7 w-7 text-teal-600" aria-hidden="true" />
+                    <Trophy className="mx-auto h-7 w-7 text-slate-300" aria-hidden="true" />
                     <p className="mt-3 text-sm font-semibold text-slate-800">Leaderboard data is not available yet</p>
                     <p className="mt-1 text-xs text-slate-500">Connect to the backend to load verified learner rankings.</p>
                   </td>
@@ -65,7 +62,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries = [] }) => {
                     key={user.id}
                     className={`border-b border-slate-100 transition-colors last:border-b-0 hover:bg-teal-50/50 ${isCurrentUser ? 'bg-teal-50/70' : ''}`}
                   >
-                    <td className="px-4 py-4 font-mono font-bold text-slate-700">
+                    <td className="px-4 py-4 tabular-nums font-semibold text-slate-700">
                       <span className="flex items-center gap-2">
                         {rankDisplay(user.rank)}
                         <span className="sr-only">Rank {user.rank}</span>
@@ -80,16 +77,16 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({ entries = [] }) => {
                       </span>
                     </th>
                     <td className="px-4 py-4">
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-slate-600">{user.role}</span>
+                      <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">{user.role}</span>
                     </td>
-                    <td className="px-4 py-4 text-center font-mono text-slate-700">{user.completed_challenges}</td>
+                    <td className="px-4 py-4 text-center tabular-nums text-slate-700">{user.completed_challenges}</td>
                     <td className="px-4 py-4 text-center">
-                      <span className="inline-flex items-center gap-1 font-mono font-semibold text-amber-700">
-                        <Flame className="h-3.5 w-3.5 text-enginx-cta" aria-hidden="true" />
+                      <span className="inline-flex items-center gap-1 tabular-nums font-semibold text-slate-600">
+                        <Flame className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
                         {user.streak_days}d
                       </span>
                     </td>
-                    <td className="px-4 py-4 text-right font-mono font-bold text-slate-800">
+                    <td className="px-4 py-4 text-right tabular-nums font-semibold text-slate-800">
                       {user.xp} <span className="text-[10px] text-enginx-primary">XP</span>
                     </td>
                   </tr>

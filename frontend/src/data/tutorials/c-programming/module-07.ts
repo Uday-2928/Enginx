@@ -527,8 +527,8 @@ export const module07Lessons: TutorialLesson[] = [
           id: 'q2',
           kind: 'multiple-choice',
           prompt: 'What ends a C string?',
-          options: ['A newline character', 'A zero byte (\\'\\0\\')', 'The array size', 'A space'],
-          answer: 'A zero byte (\'\\0\')',
+          options: ['A newline character', "A zero byte ('\\0')", 'The array size', 'A space'],
+          answer: "A zero byte ('\\0')",
           explanation:
             'The null terminator, value 0, marks the end. Every string function scans to it; its absence sends them walking through neighboring memory.',
           hint: 'It is invisible when printed and one byte long.',

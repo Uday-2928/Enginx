@@ -13,6 +13,15 @@ from typing import List, Dict, Any
 from .base_runner import BaseRunner, EvaluationResult, TestCaseResult
 
 class VerilogRunner(BaseRunner):
+    """Extra flags let the evaluator select the HDL language generation
+    (for example ['-g2012'] for the SystemVerilog subset Icarus supports)
+    without changing the runner's testbench contract."""
+
+    def __init__(self, timeout_seconds: float = 5.0, memory_limit_mb: int = 128,
+                 iverilog_flags: List[str] | None = None):
+        super().__init__(timeout_seconds=timeout_seconds, memory_limit_mb=memory_limit_mb)
+        self.iverilog_flags = list(iverilog_flags or [])
+
     def evaluate(self, code: str, test_cases: List[Dict[str, Any]]) -> EvaluationResult:
         start_time = time.time()
         has_iverilog = shutil.which("iverilog") is not None and shutil.which("vvp") is not None
@@ -41,13 +50,24 @@ class VerilogRunner(BaseRunner):
                 f.write(tb_code)
 
             # 1. Compile with iverilog
-            compile_proc = subprocess.run(
-                ["iverilog", "-o", sim_path, dut_path, tb_path],
-                cwd=tmpdir,
-                capture_output=True,
-                text=True,
-                timeout=self.timeout_seconds
-            )
+            try:
+                compile_proc = subprocess.run(
+                    ["iverilog", *self.iverilog_flags, "-o", sim_path, dut_path, tb_path],
+                    cwd=tmpdir,
+                    capture_output=True,
+                    text=True,
+                    timeout=self.timeout_seconds
+                )
+            except subprocess.TimeoutExpired:
+                return EvaluationResult(
+                    verdict="TLE",
+                    total_time_ms=round((time.time() - start_time) * 1000, 2),
+                    memory_used_kb=2048,
+                    output="Compilation timed out.",
+                    test_results=[],
+                    passed_count=0,
+                    total_count=len(test_cases)
+                )
 
             total_duration = round((time.time() - start_time) * 1000, 2)
 

@@ -13,7 +13,7 @@ export interface TutorialCodeSample {
   title: string;
   language: TutorialCodeLanguage;
   code: string;
-  explanation: string[];
+  explanation?: string[];
 }
 
 export interface TutorialTable {
@@ -113,9 +113,10 @@ export interface TutorialProject {
   starterCode?: TutorialCodeSample;
   testPlan: string[];
   expectedResults: string;
-  troubleshooting: string[];
+  troubleshooting: Array<string | { title: string; detail: string }>;
   hardwareDependencies?: string;
   challengeId?: string;
+  synthesisConsiderations?: string;
 }
 
 export interface TutorialCourse {

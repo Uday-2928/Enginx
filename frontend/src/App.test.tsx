@@ -31,6 +31,7 @@ describe('EnginX light UI', () => {
   afterEach(() => {
     cleanup();
     clearAuthSession();
+    window.localStorage.removeItem('enginx.active.tab');
     window.localStorage.removeItem('enginx.editor.draft.test-user.cse-01-two-sum');
     window.localStorage.removeItem('enginx.editor.draft.test-user.ece-matlab-01-sampling');
     vi.unstubAllGlobals();
@@ -57,7 +58,7 @@ describe('EnginX light UI', () => {
 
     await user.click(screen.getByRole('button', { name: /^skill tree$/i }));
 
-    expect(await screen.findByRole('heading', { name: /build your engineering skill tree/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /skill tree/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /computer science/i })).toHaveAttribute('aria-pressed', 'false');
   });
 
@@ -148,11 +149,11 @@ describe('EnginX light UI', () => {
     render(<App />);
     const markComplete = await screen.findByRole('button', { name: /mark complete/i });
     await user.click(markComplete);
-    expect(await screen.findByRole('button', { name: /lesson complete/i })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /^completed$/i })).toBeDisabled();
 
     cleanup();
     render(<App />);
-    expect(await screen.findByRole('button', { name: /lesson complete/i })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /^completed$/i })).toBeDisabled();
     expect(fetchMock.mock.calls.some(([input, init]) => (
       String(input).includes('/api/user/lessons/lesson-cse-01-two-sum/complete')
       && init?.method === 'POST'

@@ -122,11 +122,11 @@ export const AssessmentQuiz: React.FC<AssessmentQuizProps> = ({ assessment, onPa
           {passed
             ? <CheckCircle2 className="h-5 w-5 text-emerald-700" aria-hidden="true" />
             : <RotateCcw className="h-5 w-5 text-amber-700" aria-hidden="true" />}
-          <p className={`text-sm font-extrabold ${passed ? 'text-emerald-900' : 'text-amber-900'}`}>
+          <p className={`text-sm font-semibold ${passed ? 'text-emerald-900' : 'text-amber-900'}`}>
             {passed ? 'Assessment passed' : 'Not passed yet'}
           </p>
         </div>
-        <p className={`mt-3 font-mono text-3xl font-bold ${passed ? 'text-emerald-900' : 'text-amber-900'}`}>
+        <p className={`mt-3 text-3xl font-semibold tabular-nums ${passed ? 'text-emerald-900' : 'text-amber-900'}`}>
           {finalScore}%
         </p>
         <p className="mt-1 text-xs leading-5 text-slate-600">
@@ -139,13 +139,13 @@ export const AssessmentQuiz: React.FC<AssessmentQuizProps> = ({ assessment, onPa
         )}
         {!passed && (
           <p className="mt-2 text-xs leading-5 text-amber-800">
-            Review the explanations above, then retake the assessment to unlock lesson completion.
+            Review the explanations above, then retake the assessment to mark this lesson complete.
           </p>
         )}
         <button
           type="button"
           onClick={retake}
-          className="focus-ring mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 hover:border-teal-300 hover:bg-teal-50"
+          className="focus-ring mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-teal-300 hover:bg-teal-50"
         >
           <RotateCcw className="h-4 w-4" aria-hidden="true" />
           Retake assessment
@@ -157,10 +157,10 @@ export const AssessmentQuiz: React.FC<AssessmentQuizProps> = ({ assessment, onPa
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-slate-500">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Question {index + 1} of {total} · {assessment.title}
         </p>
-        <p className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-600">
+        <p className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold tabular-nums text-slate-600">
           Score: {firstTryCount}/{total}
         </p>
       </div>
@@ -212,7 +212,7 @@ export const AssessmentQuiz: React.FC<AssessmentQuizProps> = ({ assessment, onPa
           <button
             type="submit"
             disabled={solved}
-            className="focus-ring min-h-[44px] rounded-lg bg-enginx-primary px-4 text-sm font-bold text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-ring btn-primary"
           >
             Check answer
           </button>
@@ -238,13 +238,13 @@ export const AssessmentQuiz: React.FC<AssessmentQuizProps> = ({ assessment, onPa
         <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3" role="status">
           <p className="flex items-center gap-2 text-sm font-bold text-emerald-900">
             <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-            Correct!
+            Correct.
           </p>
           <p className="mt-1 text-xs leading-5 text-emerald-900">{current.explanation}</p>
           <button
             type="button"
             onClick={advance}
-            className="focus-ring mt-3 inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-enginx-primary px-4 text-sm font-bold text-white hover:bg-teal-700"
+            className="focus-ring btn-primary mt-3"
           >
             {index < total - 1 ? 'Next question' : 'Finish attempt'}
             <ArrowRight className="h-4 w-4" aria-hidden="true" />

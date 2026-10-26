@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import type { TutorialCourse, TutorialProject } from '../../data/tutorials/types';
 import { courseProgress, getTutorialCourse, isTutorialLessonComplete } from '../../data/tutorials/registry';
+import { levelBadgeClasses } from './levelBadge';
 
 export interface CourseViewProps {
   course: TutorialCourse;
@@ -23,12 +24,6 @@ export interface CourseViewProps {
   onOpenCourse?: (courseId: string) => void;
 }
 
-const LEVEL_BADGE: Record<TutorialCourse['level'], string> = {
-  beginner: 'bg-emerald-50 text-emerald-800',
-  intermediate: 'bg-teal-50 text-teal-800',
-  advanced: 'bg-amber-50 text-amber-800',
-};
-
 const ProjectCard: React.FC<{ project: TutorialProject; onOpenChallenge: (challengeId: string) => void }> = ({
   project,
   onOpenChallenge,
@@ -37,8 +32,8 @@ const ProjectCard: React.FC<{ project: TutorialProject; onOpenChallenge: (challe
   return (
     <article className="surface-card p-5">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-base font-extrabold text-slate-900">{project.title}</h3>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold ${LEVEL_BADGE[project.level]}`}>
+        <h3 className="text-base font-semibold text-slate-900">{project.title}</h3>
+        <span className={`shrink-0 ${levelBadgeClasses(project.level)}`}>
           {project.level}
         </span>
       </div>
@@ -50,7 +45,7 @@ const ProjectCard: React.FC<{ project: TutorialProject; onOpenChallenge: (challe
       )}
       {project.learningOutcomes.length > 0 && (
         <div className="mt-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Learning outcomes</p>
+          <p className="eyebrow">Learning outcomes</p>
           <ul className="mt-1 space-y-1">
             {project.learningOutcomes.map((outcome, outcomeIndex) => (
               <li key={`outcome-${outcomeIndex}`} className="flex items-start gap-2 text-xs leading-5 text-slate-600">
@@ -69,7 +64,7 @@ const ProjectCard: React.FC<{ project: TutorialProject; onOpenChallenge: (challe
         <button
           type="button"
           onClick={() => onOpenChallenge(challengeId)}
-          className="focus-ring mt-3 inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-teal-300 bg-teal-50 px-3 text-xs font-bold text-teal-900 hover:bg-teal-100"
+          className="focus-ring btn-secondary mt-3"
         >
           <Play className="h-3.5 w-3.5" aria-hidden="true" />
           Open linked challenge
@@ -117,31 +112,32 @@ export const CourseView: React.FC<CourseViewProps> = ({
       <button
         type="button"
         onClick={onBackToCatalogue}
-        className="focus-ring inline-flex min-h-[40px] items-center gap-2 rounded-lg text-sm font-bold text-teal-800 hover:text-teal-950"
+        className="focus-ring inline-flex min-h-[40px] items-center gap-2 rounded-lg text-sm font-semibold text-teal-800 hover:text-teal-950"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         All tutorials
       </button>
 
       <header className="mt-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${LEVEL_BADGE[course.level]}`}>
+        <p className="eyebrow">Course</p>
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{course.title}</h1>
+        <p className="mt-1 text-sm text-slate-600">{course.tagline}</p>
+        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{course.description}</p>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className={levelBadgeClasses(course.level)}>
             {course.level}
           </span>
           {isDraft && (
-            <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+            <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
               Draft
             </span>
           )}
           {course.domains.map((domain) => (
-            <span key={domain} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-bold text-slate-500">
+            <span key={domain} className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[10px] font-semibold text-slate-500">
               {domain}
             </span>
           ))}
         </div>
-        <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{course.title}</h1>
-        <p className="mt-1 text-sm font-semibold text-teal-800">{course.tagline}</p>
-        <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{course.description}</p>
       </header>
 
       {isDraft && (
@@ -152,26 +148,26 @@ export const CourseView: React.FC<CourseViewProps> = ({
       )}
 
       <dl className="mt-5 grid gap-3 sm:grid-cols-3">
-        <div className="surface-card p-4">
-          <dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">
+        <div className="surface-card p-5">
+          <dt className="eyebrow flex items-center gap-1.5">
             <Clock className="h-3.5 w-3.5 text-teal-700" aria-hidden="true" />
             Estimated hours
           </dt>
-          <dd className="mt-1 font-mono text-xl font-bold text-slate-900">~{course.estimatedHours} h</dd>
+          <dd className="mt-1 text-xl font-semibold tabular-nums text-slate-900">~{course.estimatedHours} h</dd>
         </div>
-        <div className="surface-card p-4">
-          <dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">
+        <div className="surface-card p-5">
+          <dt className="eyebrow flex items-center gap-1.5">
             <Layers3 className="h-3.5 w-3.5 text-teal-700" aria-hidden="true" />
             Modules
           </dt>
-          <dd className="mt-1 font-mono text-xl font-bold text-slate-900">{course.modules.length}</dd>
+          <dd className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{course.modules.length}</dd>
         </div>
-        <div className="surface-card p-4">
-          <dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-slate-500">
+        <div className="surface-card p-5">
+          <dt className="eyebrow flex items-center gap-1.5">
             <CheckCircle2 className="h-3.5 w-3.5 text-teal-700" aria-hidden="true" />
             Your progress
           </dt>
-          <dd className="mt-1 font-mono text-xl font-bold text-slate-900">{progress.percent}%</dd>
+          <dd className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{progress.percent}%</dd>
         </div>
       </dl>
 
@@ -182,7 +178,7 @@ export const CourseView: React.FC<CourseViewProps> = ({
           </span>
           <span>{progress.percent}%</span>
         </div>
-        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+        <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-slate-100">
           <div className="h-full rounded-full bg-enginx-primary transition-[width]" style={{ width: `${progress.percent}%` }} />
         </div>
       </div>
@@ -199,7 +195,7 @@ export const CourseView: React.FC<CourseViewProps> = ({
                     key={prerequisiteId}
                     type="button"
                     onClick={() => onOpenCourse(prerequisiteId)}
-                    className="focus-ring min-h-[36px] rounded-full border border-teal-200 bg-teal-50 px-3 text-xs font-bold text-teal-900 hover:bg-teal-100"
+                    className="focus-ring min-h-[36px] rounded-full border border-teal-200 bg-teal-50 px-3 text-xs font-semibold text-teal-900 hover:bg-teal-100"
                     title={`Open ${prerequisiteCourse.title}`}
                   >
                     <BookOpen className="mr-1.5 inline h-3.5 w-3.5" aria-hidden="true" />
@@ -235,11 +231,12 @@ export const CourseView: React.FC<CourseViewProps> = ({
       )}
 
       <section className="mt-8" aria-label="Modules and lessons">
-        <h2 className="text-lg font-extrabold text-slate-900">Modules</h2>
+        <h2 className="text-lg font-semibold text-slate-900">Modules</h2>
         {course.modules.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-            Modules for this course are still being planned. Check back soon.
-          </p>
+          <div className="mt-3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+            <Layers3 className="h-7 w-7 text-slate-300" aria-hidden="true" />
+            <p className="mt-3 text-sm text-slate-600">Modules for this course are still being planned. Check back soon.</p>
+          </div>
         ) : (
           <div className="mt-3 space-y-3">
             {course.modules.map((module, moduleIndex) => {
@@ -256,7 +253,7 @@ export const CourseView: React.FC<CourseViewProps> = ({
                     className="focus-ring flex w-full items-start justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50"
                   >
                     <span className="min-w-0">
-                      <span className="block text-sm font-extrabold text-slate-900">
+                      <span className="block text-sm font-semibold text-slate-900">
                         {moduleIndex + 1}. {module.title}
                       </span>
                       <span className="mt-0.5 block text-xs leading-5 text-slate-600">{module.summary}</span>
@@ -292,7 +289,7 @@ export const CourseView: React.FC<CourseViewProps> = ({
                                     <Circle className="mt-0.5 h-5 w-5 shrink-0 text-slate-300" aria-hidden="true" />
                                   )}
                                   <span className="min-w-0 flex-1">
-                                    <span className="block text-sm font-bold text-slate-900">
+                                    <span className="block text-sm font-semibold text-slate-900">
                                       {moduleIndex + 1}.{lessonIndex + 1} {lesson.title}
                                     </span>
                                     {lesson.summary && (
@@ -320,15 +317,15 @@ export const CourseView: React.FC<CourseViewProps> = ({
       </section>
 
       <section className="mt-8" aria-label="Projects">
-        <h2 className="flex items-center gap-2 text-lg font-extrabold text-slate-900">
-          <FlaskConical className="h-5 w-5 text-teal-700" aria-hidden="true" />
-          Projects
-        </h2>
+        <h2 className="text-lg font-semibold text-slate-900">Projects</h2>
         {course.projects.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-            Guided projects for this course are still being designed. They will appear here with requirements,
-            starter code and a test plan.
-          </p>
+          <div className="mt-3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+            <FlaskConical className="h-7 w-7 text-slate-300" aria-hidden="true" />
+            <p className="mt-3 text-sm text-slate-600">
+              Guided projects for this course are still being designed. They will appear here with requirements,
+              starter code and a test plan.
+            </p>
+          </div>
         ) : (
           <div className="mt-3 grid gap-4 md:grid-cols-2">
             {course.projects.map((project) => (
@@ -339,14 +336,12 @@ export const CourseView: React.FC<CourseViewProps> = ({
       </section>
 
       <section className="mt-8" aria-label="Resources">
-        <h2 className="flex items-center gap-2 text-lg font-extrabold text-slate-900">
-          <ExternalLink className="h-5 w-5 text-teal-700" aria-hidden="true" />
-          Resources
-        </h2>
+        <h2 className="text-lg font-semibold text-slate-900">Resources</h2>
         {course.resources.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-            Curated references for this course are being reviewed before publication.
-          </p>
+          <div className="mt-3 flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+            <ExternalLink className="h-7 w-7 text-slate-300" aria-hidden="true" />
+            <p className="mt-3 text-sm text-slate-600">Curated references for this course are being reviewed before publication.</p>
+          </div>
         ) : (
           <ul className="mt-3 space-y-2">
             {course.resources.map((resource) => (
@@ -359,7 +354,7 @@ export const CourseView: React.FC<CourseViewProps> = ({
                 >
                   {resource.label}
                   {resource.kind && (
-                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-slate-500">
+                    <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-slate-500">
                       {resource.kind}
                     </span>
                   )}

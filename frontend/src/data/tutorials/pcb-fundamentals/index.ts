@@ -1,4 +1,8 @@
 import type { TutorialCourse } from '../types';
+import { module01Lessons } from './module-01';
+import { module02Lessons } from './module-02';
+import { module03Lessons } from './module-03';
+import { projects } from './projects';
 
 export const course: TutorialCourse = {
   id: 'pcb-fundamentals',
@@ -7,7 +11,7 @@ export const course: TutorialCourse = {
   description:
     'A practical hardware course: identifying components and reading schematics, power distribution, grounding and signal integrity, then measurement and debugging with multimeters, oscilloscopes and logic analyzers. Every technique is framed with its limits — what a measurement can and cannot prove about a circuit.',
   level: 'beginner',
-  status: 'draft',
+  status: 'published',
   domains: ['ECE', 'HARDWARE'],
   trackTags: ['Hardware'],
   estimatedHours: 16,
@@ -25,22 +29,22 @@ export const course: TutorialCourse = {
       id: 'm01',
       title: 'Components & Schematics',
       summary: 'Passives, diodes, transistors and ICs, reference designators, net names, schematic conventions and reading a real design top-down.',
-      lessons: [],
+      lessons: module01Lessons,
     },
     {
       id: 'm02',
       title: 'Power, Grounding & SI',
       summary: 'Voltage rails and regulators, decoupling capacitors, ground loops, return currents and first-principles signal integrity awareness.',
-      lessons: [],
+      lessons: module02Lessons,
     },
     {
       id: 'm03',
       title: 'Measurement & Debug Tools',
       summary: 'Multimeter modes and limits, oscilloscope probing and triggering, logic analyzers and a repeatable divide-and-conquer debug method.',
-      lessons: [],
+      lessons: module03Lessons,
     },
   ],
-  projects: [],
+  projects,
   resources: [
     { label: 'KiCad documentation', url: 'https://docs.kicad.org/', kind: 'tool' },
     { label: 'Wikipedia — Printed circuit board', url: 'https://en.wikipedia.org/wiki/Printed_circuit_board', kind: 'article' },

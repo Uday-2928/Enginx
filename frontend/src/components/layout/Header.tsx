@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Award,
+  BookOpen,
   Bot,
   Check,
   ChevronDown,
@@ -9,9 +10,9 @@ import {
   Flame,
   Layers3,
   LayoutDashboard,
+  LayoutGrid,
   LogOut,
   Shield,
-  Sparkles,
   Trophy,
   UserCheck,
   Zap,
@@ -21,6 +22,7 @@ import { normalizeBranch, type EngineeringBranch } from '../../data/challengeFil
 type AppTab =
   | 'ece-hub'
   | 'cyber-hub'
+  | 'domains'
   | 'challenges'
   | 'skill-tree'
   | 'badges'
@@ -44,7 +46,7 @@ const BRANCH_OPTIONS: { id: EngineeringBranch; label: string; desc: string; icon
   { id: 'CYBER', label: 'Cybersecurity & CTF', desc: 'Cryptography & Vulnerability Challenges', icon: Shield },
   { id: 'ROBOTICS', label: 'Robotics & Control', desc: 'Kinematics & Multi-DOF Systems', icon: Bot },
   { id: 'HARDWARE', label: 'Hardware & Logic Gates', desc: 'Circuit Modeling & Combinational Logic', icon: Cpu },
-  { id: 'ALL', label: 'All Branches (Unrestricted)', desc: 'View challenges across every engineering discipline', icon: Sparkles },
+  { id: 'ALL', label: 'All Branches (Unrestricted)', desc: 'View challenges across every engineering discipline', icon: LayoutGrid },
 ];
 
 export const Header: React.FC<HeaderProps> = ({
@@ -87,6 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
   const navItems = [
     { id: 'ece-hub' as const, label: 'ECE Hub', icon: LayoutDashboard },
     { id: 'cyber-hub' as const, label: 'Cyber Hub', icon: Shield },
+    { id: 'domains' as const, label: 'Domains', icon: BookOpen },
     { id: 'challenges' as const, label: 'Challenges', icon: Code2 },
     { id: 'skill-tree' as const, label: 'Skill tree', icon: Layers3 },
     { id: 'badges' as const, label: 'Badges', icon: Award },
@@ -94,7 +97,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-teal-100 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white">
       <div className="mx-auto flex min-h-[4.5rem] w-full max-w-[1720px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 sm:px-6 lg:px-8">
         {/* Brand */}
         <button
@@ -103,17 +106,14 @@ export const Header: React.FC<HeaderProps> = ({
           className="focus-ring group flex min-h-[44px] items-center gap-3 rounded-xl text-left"
           aria-label="EnginX home"
         >
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-teal-200 bg-teal-50 text-enginx-primary transition-colors group-hover:border-teal-400 group-hover:bg-teal-100">
+          <span className="icon-chip">
             <Cpu className="h-5 w-5" aria-hidden="true" />
           </span>
           <span>
-            <span className="flex items-center gap-2 font-extrabold tracking-tight text-slate-900">
+            <span className="flex items-center gap-2 font-semibold tracking-tight text-slate-900">
               Engin<span className="text-enginx-primary">X</span>
-              <span className="rounded-md bg-teal-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-enginx-primary">
-                v1.0
-              </span>
             </span>
-            <span className="hidden text-[11px] text-slate-500 sm:block">Hands-on engineering learning</span>
+            <span className="hidden text-[11px] text-slate-500 sm:block">Engineering practice workspace</span>
           </span>
         </button>
 
@@ -130,10 +130,10 @@ export const Header: React.FC<HeaderProps> = ({
                 type="button"
                 onClick={() => setCurrentTab(id)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`focus-ring flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border px-3 text-sm font-semibold transition-colors ${
+                className={`focus-ring flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg px-3 text-sm font-semibold transition-colors ${
                   isActive
-                    ? 'border-teal-200 bg-teal-50 text-enginx-primary'
-                    : 'border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-teal-50 text-teal-800'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
@@ -145,12 +145,12 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Progress + profile actions */}
         <div className="ml-auto flex items-center gap-2">
-          <div className="hidden min-h-[44px] items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-800 sm:flex">
-            <Flame className="h-4 w-4 text-enginx-cta" aria-hidden="true" />
+          <div className="hidden min-h-[44px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold tabular-nums text-slate-600 sm:flex">
+            <Flame className="h-4 w-4 text-slate-400" aria-hidden="true" />
             <span>{streakDays === null ? 'Streak unavailable' : `${streakDays} day streak`}</span>
           </div>
-          <div className="flex min-h-[44px] items-center gap-2 rounded-lg border border-teal-200 bg-teal-50 px-3 text-xs font-bold text-slate-800">
-            <Zap className="h-4 w-4 text-enginx-primary" aria-hidden="true" />
+          <div className="flex min-h-[44px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold tabular-nums text-slate-600">
+            <Zap className="h-4 w-4 text-teal-600" aria-hidden="true" />
             <span>{userXp === null ? 'XP unavailable' : <>{userXp} <span className="text-enginx-primary">XP</span></>}</span>
           </div>
 
@@ -164,7 +164,7 @@ export const Header: React.FC<HeaderProps> = ({
               aria-label={`Current branch: ${userRole || 'All'}`}
               className={`focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border px-3 text-xs font-semibold transition-colors ${
                 isBranchDropdownOpen
-                  ? 'border-teal-500 bg-teal-50 text-teal-900 ring-2 ring-teal-500/20'
+                  ? 'border-teal-300 bg-teal-50 text-teal-900'
                   : 'border-slate-200 bg-white text-slate-700 hover:border-teal-300 hover:bg-teal-50'
               }`}
               title="Change engineering branch / domain"
@@ -178,10 +178,10 @@ export const Header: React.FC<HeaderProps> = ({
               <div
                 role="listbox"
                 aria-label="Select engineering branch"
-                className="absolute right-0 top-full z-50 mt-2 w-72 rounded-2xl border border-teal-100 bg-white p-2 shadow-2xl ring-1 ring-slate-900/5 animate-fade-in"
+                className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-slate-200 bg-white p-2 shadow-lg animate-fade-in"
               >
                 <div className="px-3 py-2 border-b border-slate-100">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Select Engineering Branch</p>
+                  <p className="eyebrow">Select Engineering Branch</p>
                   <p className="text-xs text-slate-600">Filters challenges & topics to your domain</p>
                 </div>
 
@@ -202,14 +202,14 @@ export const Header: React.FC<HeaderProps> = ({
                           }
                           setIsBranchDropdownOpen(false);
                         }}
-                        className={`flex w-full items-start gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors ${
+                        className={`flex w-full items-start gap-2.5 rounded-lg px-3 py-2.5 text-left transition-colors ${
                           isSelected
                             ? 'bg-teal-50 text-teal-900 font-semibold'
                             : 'hover:bg-slate-50 text-slate-700'
                         }`}
                       >
                         <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${
-                          isSelected ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-600'
+                          isSelected ? 'bg-teal-50 text-teal-600' : 'bg-slate-100 text-slate-600'
                         }`}>
                           <Icon className="h-4 w-4" aria-hidden="true" />
                         </span>
@@ -232,7 +232,7 @@ export const Header: React.FC<HeaderProps> = ({
                       setIsBranchDropdownOpen(false);
                       onOpenOnboarding();
                     }}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-teal-700 transition-colors"
+                    className="focus-ring flex w-full min-h-[44px] items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                   >
                     <UserCheck className="h-4 w-4 text-slate-400" aria-hidden="true" />
                     <span>Edit full profile & degree...</span>

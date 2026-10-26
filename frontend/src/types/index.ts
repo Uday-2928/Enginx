@@ -4,6 +4,8 @@ export type Discipline =
   | 'all'
   | 'cse'
   | 'ece-verilog'
+  | 'ece-systemverilog'
+  | 'ece-rtl'
   | 'ece-embedded'
   | 'ece-matlab'
   | 'ai-ml'
@@ -36,7 +38,7 @@ export interface ChallengeExecutionMetadata {
 
 export type PrimaryRole = 'CSE' | 'ECE' | 'AI' | 'CYBER' | 'ROBOTICS' | 'HARDWARE';
 
-export type Difficulty = 'Easy' | 'Medium' | 'Hard';
+export type Difficulty = 'Easy' | 'Medium' | 'Hard' | 'Extra Hard' | 'Insane';
 
 export interface TestCase {
   id: string;
@@ -413,55 +415,74 @@ export interface CybersecurityAssessment {
 export interface CybersecurityLesson {
   id: string;
   title: string;
-  duration_minutes: number;
+  slug?: string;
+  duration_minutes?: number;
+  durationMinutes?: number;
   level: CybersecurityLevel;
   summary: string;
   body: string;
-  key_points: string[];
-  code_sample: string;
-  exercise: string;
-  hint: string;
-  assessment: CybersecurityAssessment;
-  challenge_id: string | null;
+  key_points?: string[];
+  keyPoints?: string[];
+  code_sample?: string;
+  codeSample?: string;
+  exercise?: string;
+  hint?: string;
+  assessment?: CybersecurityAssessment;
+  check?: CybersecurityAssessment | { question: string; answer: string; explanation: string };
+  challenge_id?: string | null;
+  challengeId?: string | null;
 }
 
 export interface CybersecurityCourse {
   id: string;
   title: string;
-  slug: string;
+  slug?: string;
+  eyebrow?: string;
   level: CybersecurityLevel;
-  estimated_hours: number;
+  estimated_hours?: number;
+  estimatedHours?: number;
   summary: string;
   topics: string[];
+  outcomes?: string[];
   lessons: CybersecurityLesson[];
-  xp_reward: number;
+  xp_reward?: number;
+  xpReward?: number;
 }
 
 export interface CybersecurityLab {
   id: string;
   title: string;
-  difficulty: Difficulty;
-  duration_minutes: number;
+  difficulty: Difficulty | string;
+  duration_minutes?: number;
+  durationMinutes?: number;
   environment: string;
   summary: string;
   objectives: string[];
   prerequisites: string[];
-  challenge_id: string | null;
-  hands_on: boolean;
+  challenge_id?: string | null;
+  challengeId?: string | null;
+  hands_on?: boolean;
+  execution?: { kind: string; label: string; challengeId?: string };
 }
 
 export interface CybersecurityCTFChallenge {
   id: string;
   title: string;
-  slug: string;
-  difficulty: Difficulty;
+  slug?: string;
+  difficulty: Difficulty | string;
   category: string;
-  category_detail: string;
+  category_detail?: string;
+  categoryDetail?: string;
   summary: string;
-  challenge_id: string | null;
-  xp_reward: number;
+  challenge_id?: string | null;
+  challengeId?: string | null;
+  xp_reward?: number;
+  xpReward?: number;
   tags: string[];
-  solved: boolean;
+  solved?: boolean;
+  briefing?: string;
+  hints?: string[];
+  flag?: string;
 }
 
 export interface CybersecurityLessonProgress {

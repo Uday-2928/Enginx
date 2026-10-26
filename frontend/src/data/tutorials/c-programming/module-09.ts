@@ -342,12 +342,6 @@ export const module09Lessons: TutorialLesson[] = [
           id: 'q2',
           kind: 'multiple-choice',
           prompt: 'What is sizeof of the union below?',
-          options: [
-            'The sum of the members (12 bytes)',
-            'The largest member (4 bytes)',
-            'The smallest member (1 byte)',
-            'Undefined',
-          ],
           code: 'typedef union {\n    uint32_t word;\n    uint16_t half;\n    uint8_t  byte;\n} Trio;',
           options: ['The sum of the members (12 bytes)', 'The largest member (4 bytes)', 'The smallest member (1 byte)', 'Undefined'],
           answer: 'The largest member (4 bytes)',

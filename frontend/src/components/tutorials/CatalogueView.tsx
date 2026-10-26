@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { BookOpen, CircleAlert, Clock, Layers3, Search, X } from 'lucide-react';
 import type { TutorialCourse } from '../../data/tutorials/types';
 import { courseProgress } from '../../data/tutorials/registry';
+import { levelBadgeClasses } from './levelBadge';
 
 export interface CatalogueViewProps {
   courses: TutorialCourse[];
@@ -9,12 +10,6 @@ export interface CatalogueViewProps {
   completedLessonIds: string[];
   onOpenCourse: (courseId: string) => void;
 }
-
-const LEVEL_BADGE: Record<TutorialCourse['level'], string> = {
-  beginner: 'bg-emerald-50 text-emerald-800',
-  intermediate: 'bg-teal-50 text-teal-800',
-  advanced: 'bg-amber-50 text-amber-800',
-};
 
 const LEVEL_FILTERS: Array<'all' | TutorialCourse['level']> = ['all', 'beginner', 'intermediate', 'advanced'];
 
@@ -50,7 +45,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
     <div className="mx-auto max-w-5xl px-4 pb-10 pt-5 sm:px-6">
       <header>
         <p className="eyebrow">EnginX workspace · Engineering tutorials</p>
-        <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
           Structured engineering courses
         </h1>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -83,7 +78,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
         </label>
 
         <div className="flex flex-wrap items-center gap-2" aria-label="Difficulty filter">
-          <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Level</span>
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Level</span>
           {LEVEL_FILTERS.map((level) => (
             <button
               key={level}
@@ -103,7 +98,7 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
 
         {allTags.length > 0 && (
           <div className="flex flex-wrap items-center gap-2" aria-label="Track filter">
-            <span className="text-xs font-bold uppercase tracking-wide text-slate-500">Tracks</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Tracks</span>
             {allTags.map((tag) => (
               <button
                 key={tag}
@@ -124,14 +119,27 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
       </div>
 
       {filteredCourses.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-8 text-center" role="status">
+        <div className="mt-8 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center" role="status">
           <CircleAlert className="mx-auto h-8 w-8 text-slate-300" aria-hidden="true" />
-          <p className="mt-3 text-sm font-bold text-slate-800">No tutorials match your filters</p>
+          <p className="mt-3 text-sm font-semibold text-slate-800">No tutorials match your filters</p>
           <p className="mt-1 text-xs leading-5 text-slate-500">
             {courses.length === 0
               ? 'No courses are published for your branch yet — new tracks are being authored.'
               : 'Try clearing the search box or removing a track or level filter.'}
           </p>
+          {courses.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('');
+                setLevelFilter('all');
+                setActiveTags([]);
+              }}
+              className="focus-ring btn-secondary mt-4"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
       ) : (
         <ul className="mt-6 grid gap-4 md:grid-cols-2">
@@ -141,22 +149,22 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
               <li key={course.id}>
                 <article className="surface-card flex h-full flex-col p-5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${LEVEL_BADGE[course.level]}`}>
+                    <span className={levelBadgeClasses(course.level)}>
                       {course.level}
                     </span>
                     {course.status === 'draft' && (
-                      <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-amber-800">
+                      <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-amber-800">
                         Draft
                       </span>
                     )}
                     {course.domains.map((domain) => (
-                      <span key={domain} className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                      <span key={domain} className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold text-slate-500">
                         {domain}
                       </span>
                     ))}
                   </div>
-                  <h2 className="mt-3 text-base font-extrabold text-slate-900">{course.title}</h2>
-                  <p className="mt-1 text-sm text-teal-800">{course.tagline}</p>
+                  <h2 className="mt-3 text-base font-semibold text-slate-900">{course.title}</h2>
+                  <p className="mt-1 text-sm text-slate-600">{course.tagline}</p>
                   <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <span className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5" aria-hidden="true" />~{course.estimatedHours} h
@@ -171,12 +179,12 @@ export const CatalogueView: React.FC<CatalogueViewProps> = ({ courses, branchLab
                     </span>
                   </div>
                   <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
-                    <div className="h-full rounded-full bg-enginx-primary" style={{ width: `${progress.percent}%` }} />
+                    <div className="h-full rounded-full bg-enginx-primary transition-[width]" style={{ width: `${progress.percent}%` }} />
                   </div>
                   <button
                     type="button"
                     onClick={() => onOpenCourse(course.id)}
-                    className="focus-ring mt-4 flex min-h-[44px] w-full items-center justify-center rounded-lg bg-enginx-primary px-4 text-sm font-bold text-white hover:bg-teal-700"
+                    className="focus-ring btn-secondary mt-4 w-full"
                   >
                     {progress.totalLessons > 0 && progress.completedLessons > 0 ? 'Continue course' : 'Open course'}
                   </button>

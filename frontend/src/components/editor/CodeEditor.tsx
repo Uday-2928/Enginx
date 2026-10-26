@@ -84,11 +84,11 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   ];
 
   return (
-    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-teal-100 bg-white" aria-busy={isEvaluating}>
+    <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white" aria-busy={isEvaluating}>
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-slate-50/80 px-4 py-3">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-teal-200 bg-teal-50 text-enginx-primary">
+            <span className="icon-chip">
               <Code2 className="h-4 w-4" aria-hidden="true" />
             </span>
             <span className="truncate text-xs font-semibold text-slate-700">{editorLanguageLabel(challenge.language)}</span>
@@ -121,7 +121,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                 aria-selected={activeTab === 'output'}
                 aria-label={`Submission result: ${isUnavailable ? 'evaluation unavailable' : isAccepted ? 'accepted' : normalizedVerdict}`}
                 onClick={() => setActiveTab('output')}
-                className={`focus-ring flex min-h-[40px] shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-semibold transition-colors ${
+                className={`focus-ring flex min-h-[44px] shrink-0 items-center gap-2 rounded-lg border px-3 text-xs font-semibold transition-colors ${
                   activeTab === 'output'
                     ? isUnavailable
                       ? 'border-amber-200 bg-amber-50 text-amber-800'
@@ -144,7 +144,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               type="button"
               onClick={() => setShowHint((visible) => !visible)}
               aria-pressed={showHint}
-              className="focus-ring flex min-h-[44px] items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 text-xs font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+              className="focus-ring flex min-h-[44px] items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-300 hover:bg-teal-50"
               title="Show hint"
             >
               <Lightbulb className="h-3.5 w-3.5" aria-hidden="true" />
@@ -192,7 +192,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           <div className="min-h-0 flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4">
             <div>
               <p className="eyebrow">Verification suite</p>
-              <h3 className="mt-1 text-sm font-bold text-slate-900">Public and hidden test cases</h3>
+              <h3 className="mt-1 text-sm font-semibold text-slate-900">Public and hidden test cases</h3>
             </div>
             {challenge.test_cases.map((testCase, index) => (
               <article key={testCase.id || index} className="rounded-xl border border-slate-200 bg-white p-3 text-xs">
@@ -228,14 +228,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="eyebrow">Saved attempts</p>
-                <h3 className="mt-1 text-sm font-bold text-slate-900">Recent submissions for this challenge</h3>
+                <h3 className="mt-1 text-sm font-semibold text-slate-900">Recent submissions for this challenge</h3>
                 <p className="mt-1 text-xs leading-5 text-slate-500">Attempts are loaded from your authenticated learner history. Source code is not shown here.</p>
               </div>
               <HistoryIcon className="mt-1 h-5 w-5 shrink-0 text-teal-700" aria-hidden="true" />
             </div>
 
             {submissionHistoryLoading && (
-              <div className="flex min-h-32 items-center justify-center rounded-xl border border-dashed border-teal-200 bg-white text-xs font-semibold text-slate-600" role="status">
+              <div className="flex min-h-32 items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-xs font-semibold text-slate-600" role="status">
                 <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-teal-200 border-t-teal-700" aria-hidden="true" />
                 Loading attempt history…
               </div>
@@ -249,7 +249,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             )}
 
             {!submissionHistoryLoading && !submissionHistoryError && submissionHistory.length === 0 && (
-              <div className="flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-white p-5 text-center">
+              <div className="flex min-h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5 text-center">
                 <HistoryIcon className="h-7 w-7 text-slate-300" aria-hidden="true" />
                 <p className="mt-3 text-sm font-semibold text-slate-800">No attempts yet</p>
                 <p className="mt-1 text-xs text-slate-500">Run or submit your solution to create the first saved attempt.</p>
@@ -272,14 +272,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-sm font-bold text-slate-900">Attempt {submissionHistory.length - index}</span>
-                        <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${unavailable ? 'bg-amber-50 text-amber-800' : accepted ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                        <span className="text-sm font-semibold text-slate-900">Attempt {submissionHistory.length - index}</span>
+                        <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${unavailable ? 'bg-amber-50 text-amber-800' : accepted ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
                           {attemptLabel}
                         </span>
                       </div>
                       <p className="mt-1 text-[11px] text-slate-500">{formatSubmissionTimestamp(attempt.created_at)}</p>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-[11px] tabular-nums text-slate-500">
                       {unavailable ? 'Not graded' : `${passedCount}/${attempt.test_results.length} tests passed`}
                     </span>
                   </div>
@@ -297,7 +297,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         {activeTab === 'output' && (
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 p-4">
             {!submissionResult && isEvaluating && (
-              <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-dashed border-teal-200 bg-white text-center">
+              <div className="flex min-h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center">
                 <span className="h-7 w-7 animate-spin rounded-full border-2 border-teal-200 border-t-teal-600" aria-hidden="true" />
                 <p className="mt-3 text-sm font-semibold text-slate-800">Evaluating your solution…</p>
                 <p className="mt-1 text-xs text-slate-500">Running the verification suite.</p>
@@ -317,7 +317,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                       retryHandler();
                     }}
                     disabled={isEvaluating}
-                    className="focus-ring mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-rose-300 bg-white px-3 text-xs font-bold text-rose-800 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="focus-ring mt-4 inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-rose-300 bg-white px-3 text-xs font-semibold text-rose-800 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                     <span>Retry submission</span>
@@ -348,14 +348,14 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                       <XCircle className="h-8 w-8 shrink-0 text-rose-600" aria-hidden="true" />
                     )}
                     <div>
-                      <h3 className="text-lg font-bold">
+                      <h3 className="text-lg font-semibold">
                         {isUnavailable ? 'Evaluation unavailable' : isAccepted ? 'Accepted' : `Verdict: ${submissionResult.verdict}`}
                       </h3>
                       <p className="mt-0.5 text-xs opacity-80">
                         {isUnavailable
                           ? submissionResult.output || 'The evaluation service is unavailable. Your code was not graded.'
                           : isAccepted
-                          ? `Challenge completed! +${submissionResult.xp_awarded} XP earned.`
+                          ? `Challenge completed. +${submissionResult.xp_awarded} XP awarded.`
                           : 'Logic test failed. Review the test case outputs below.'}
                       </p>
                     </div>
@@ -365,7 +365,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                     {isUnavailable ? (
                       <span className="text-xs font-semibold text-amber-800">No execution recorded</span>
                     ) : (
-                      <div className="flex gap-4 text-xs font-mono text-slate-600 sm:flex-col sm:items-end sm:gap-1">
+                      <div className="flex gap-4 text-xs tabular-nums text-slate-600 sm:flex-col sm:items-end sm:gap-1">
                         <span className="flex items-center gap-1">
                           <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
                           {submissionResult.execution_time_ms} ms
@@ -384,7 +384,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                           retryHandler();
                         }}
                         disabled={isEvaluating}
-                        className="focus-ring inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 text-xs font-bold text-amber-900 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="focus-ring inline-flex min-h-[40px] items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 text-xs font-semibold text-amber-900 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
                         <span>Retry evaluation</span>
@@ -413,8 +413,8 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-slate-800">Test case #{testResult.test_case_id}</span>
-                          <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${
+                          <span className="font-semibold text-slate-800">Test case #{testResult.test_case_id}</span>
+                          <span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${
                             testResult.passed ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
                           }`}>
                             {testResult.passed ? 'Passed' : 'Failed'}
@@ -448,7 +448,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2 text-xs text-slate-500">
           <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>UTF-8 · ready for evaluation</span>
+          <span>{editorLanguageLabel(challenge.language)} · ready for evaluation</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -459,7 +459,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               onRun();
             }}
             disabled={isEvaluating}
-            className="focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border border-teal-200 bg-white px-4 text-xs font-bold text-teal-800 transition-colors hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-50"
+            className="focus-ring btn-secondary"
           >
             <Play className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
             <span>Run code</span>
@@ -471,7 +471,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
               onSubmit();
             }}
             disabled={isEvaluating}
-            className="btn-charge focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border border-enginx-cta bg-enginx-cta px-4 text-xs font-bold text-white hover:border-amber-700 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
+            className="btn-charge focus-ring flex min-h-[44px] items-center gap-2 rounded-lg border border-enginx-cta bg-enginx-cta px-4 text-xs font-semibold text-white hover:border-amber-700 hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50 sm:px-5"
           >
             {isEvaluating ? (
               <>

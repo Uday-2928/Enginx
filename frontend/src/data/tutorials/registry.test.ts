@@ -47,7 +47,7 @@ describe('tutorial registry', () => {
     if (injected >= 0) TUTORIAL_COURSES.splice(injected, 1);
   });
 
-  it('exposes the fifteen course skeletons in the agreed order', () => {
+  it('exposes the fifteen courses in the agreed order', () => {
     expect(TUTORIAL_COURSES.map((course) => course.id)).toEqual([
       'digital-electronics',
       'c-programming',
@@ -70,11 +70,12 @@ describe('tutorial registry', () => {
     for (const course of TUTORIAL_COURSES) {
       expect(seenIds.has(course.id)).toBe(false);
       seenIds.add(course.id);
-      expect(course.status).toBe('draft');
+      expect(['published', 'draft']).toContain(course.status);
       expect(course.domains.length).toBeGreaterThan(0);
       expect(course.modules.length).toBeGreaterThan(0);
       for (const module of course.modules) {
-        expect(module.lessons).toEqual([]);
+        // Every shipped module carries real lesson content.
+        expect(module.lessons.length).toBeGreaterThan(0);
       }
     }
   });

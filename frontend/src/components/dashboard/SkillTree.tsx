@@ -1,12 +1,12 @@
 import React from 'react';
 import {
+  ArrowRight,
   Bot,
   CheckCircle2,
   ChevronRight,
   Code2,
   Cpu,
   Lock,
-  Sparkles,
   Terminal,
   Zap,
   Waves,
@@ -103,26 +103,21 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
   const branchLabel = profile?.branch || profile?.primary_role || 'your engineering branch';
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-6xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
       <div className="max-w-2xl space-y-3">
-        <span className="inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800">
-          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-          Guided progression
-        </span>
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-          Build your engineering <span className="text-enginx-primary">skill tree</span>
-        </h1>
+        <p className="eyebrow">Progression</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Skill tree</h1>
         <p className="text-sm leading-6 text-slate-600">
-          Follow focused challenge paths across hardware and software disciplines. Complete nodes to build momentum, earn XP, and unlock the next concept.
+          Follow challenge paths per discipline. Completing a node unlocks the next.
         </p>
       </div>
 
       <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]" aria-label="Personalized learning summary">
-        <div className="rounded-2xl border border-teal-200 bg-white p-5 sm:p-6">
+        <div className="surface-card p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="eyebrow">Personal roadmap</p>
-              <h2 className="mt-1 text-xl font-bold text-slate-900">{profile ? `${branchLabel} learning path` : 'Connect your profile to personalize this path'}</h2>
+              <h2 className="mt-1 text-lg font-semibold text-slate-900">{profile ? `${branchLabel} learning path` : 'Connect your profile to personalize this path'}</h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
                 {profile?.goal
                   ? `Focused on: ${profile.goal}`
@@ -133,12 +128,12 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
             </div>
             {stats && (
               <div className="grid grid-cols-2 gap-2 text-center text-xs sm:min-w-[180px]">
-                <div className="rounded-xl border border-teal-100 bg-teal-50 p-2.5">
-                  <p className="font-mono text-lg font-bold text-teal-800">{stats.completed_count}</p>
+                <div className="rounded-lg border border-teal-100 bg-teal-50 p-2.5">
+                  <p className="tabular-nums text-lg font-semibold text-teal-800">{stats.completed_count}</p>
                   <p className="text-slate-500">verified complete</p>
                 </div>
-                <div className="rounded-xl border border-amber-100 bg-amber-50 p-2.5">
-                  <p className="font-mono text-lg font-bold text-amber-800">{stats.total_challenges}</p>
+                <div className="rounded-lg border border-amber-100 bg-amber-50 p-2.5">
+                  <p className="tabular-nums text-lg font-semibold text-amber-800">{stats.total_challenges}</p>
                   <p className="text-slate-500">catalogue items</p>
                 </div>
               </div>
@@ -152,10 +147,13 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                 <button
                   type="button"
                   onClick={() => onSelectChallenge(continueChallenge)}
-                  className="focus-ring mt-2 text-left text-sm font-bold text-teal-800 hover:text-teal-950"
+                  className="focus-ring mt-2 inline-flex min-h-[44px] flex-wrap items-center gap-x-1.5 gap-y-0.5 text-left text-sm font-semibold text-teal-800 hover:text-teal-950"
                 >
                   {continueChallenge.title}
-                  <span className="mt-1 block text-xs font-medium text-slate-500">Open the next unlocked challenge →</span>
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500">
+                    Open next challenge
+                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </span>
                 </button>
               ) : (
                 <p className="mt-2 text-sm text-slate-600">No persisted next step is available yet.</p>
@@ -178,7 +176,7 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
             <p className="text-xs font-bold uppercase tracking-wide text-slate-500">Recent verified activity</p>
             {completedTitles.length > 0 ? (
               <ul className="mt-2 grid gap-2 sm:grid-cols-3">
-                {completedTitles.map((title) => <li key={title} className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800">{title}</li>)}
+                {completedTitles.map((title) => <li key={title} className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800">{title}</li>)}
               </ul>
             ) : (
               <p className="mt-2 text-sm text-slate-600">No completed challenges have been returned for this learner yet.</p>
@@ -186,13 +184,13 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:p-6">
+        <div className="surface-card p-5 sm:p-6">
           <p className="eyebrow">Data source</p>
-          <h2 className="mt-1 text-base font-bold text-slate-900">Backend-confirmed progress</h2>
+          <h2 className="mt-1 text-base font-semibold text-slate-900">Backend-confirmed progress</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">
             Completion counts and roadmap states come from saved progress records. This view does not estimate scores or manufacture activity while the API is unavailable.
           </p>
-          <div className="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-xs text-slate-600">
+          <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
             {skillTree ? `${skillTree.nodes.length} roadmap nodes loaded from the learning API.` : 'Roadmap node data is still loading or unavailable.'}
           </div>
         </div>
@@ -214,7 +212,7 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
           return (
             <section
               key={track.id}
-              className={`rounded-2xl border bg-white p-5 sm:p-6 ${isSelected ? 'border-teal-300' : 'border-teal-100'}`}
+              className={`surface-card p-5 sm:p-6 ${isSelected ? 'border-teal-300' : ''}`}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <button
@@ -227,9 +225,9 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <span className="min-w-0">
-                    <span className="flex flex-wrap items-center gap-2 text-base font-bold text-slate-900">
+                    <span className="flex flex-wrap items-center gap-2 text-base font-semibold text-slate-900">
                       {track.name}
-                      <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                      <span className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold uppercase tracking-wide tabular-nums text-slate-500">
                         {completedCount}/{trackChallenges.length} done
                       </span>
                     </span>
@@ -241,7 +239,7 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100" aria-label={`${progressPercent}% complete`}>
                     <div className="h-full rounded-full bg-enginx-primary transition-[width] duration-300" style={{ width: `${progressPercent}%` }} />
                   </div>
-                  <span className="w-10 text-right font-mono text-xs font-bold text-slate-600">{progressPercent}%</span>
+                  <span className="w-10 text-right tabular-nums text-xs font-semibold text-slate-600">{progressPercent}%</span>
                 </div>
               </div>
 
@@ -258,7 +256,7 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                       <button
                         type="button"
                         onClick={() => onSelectChallenge(challenge)}
-                        aria-label={`${challenge.title}, ${isDone ? 'solved' : isUnlocked ? 'ready' : 'locked'}`}
+                        aria-label={`${challenge.title}, ${isDone ? 'completed' : isUnlocked ? 'ready' : 'locked'}`}
                         className={`focus-ring group min-h-[146px] w-64 shrink-0 rounded-xl border p-4 text-left transition-colors ${
                           isDone
                             ? 'border-emerald-200 bg-emerald-50/50 hover:border-emerald-400'
@@ -273,13 +271,13 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                             Node {index + 1}
                           </span>
                           {isDone ? (
-                            <span className="flex items-center gap-1 text-[10px] font-bold text-emerald-700">
+                            <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
                               <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-                              Solved
+                              Completed
                             </span>
                           ) : isUnlocked ? (
-                            <span className="flex items-center gap-1 text-[10px] font-bold text-teal-800">
-                              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span className="flex items-center gap-1 text-[10px] font-semibold text-teal-800">
+                              <ChevronRight className="h-3.5 w-3.5" aria-hidden="true" />
                               Ready
                             </span>
                           ) : (
@@ -290,12 +288,12 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
                           )}
                         </span>
 
-                        <span className="mt-4 block truncate text-sm font-bold text-slate-800 group-hover:text-teal-800">{challenge.title}</span>
+                        <span className="mt-4 block truncate text-sm font-semibold text-slate-800 group-hover:text-teal-800">{challenge.title}</span>
                         <span className="mt-1 block truncate text-xs text-slate-500">{challenge.topic}</span>
 
                         <span className="mt-4 flex items-center justify-between border-t border-slate-200 pt-3 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                           <span>{challenge.language}</span>
-                          <span className="flex items-center gap-1 font-mono normal-case tracking-normal text-teal-800">
+                          <span className="flex items-center gap-1 tabular-nums normal-case tracking-normal text-teal-800">
                             <Zap className="h-3 w-3" aria-hidden="true" />
                             +{challenge.xp_reward} XP
                           </span>

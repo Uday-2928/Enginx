@@ -242,7 +242,8 @@ function withBearerAuth(init: RequestInit, session: AuthSession): RequestInit {
 }
 
 async function requestJson<T>(url: string, init: RequestInit = {}, options: RequestOptions = {}): Promise<T> {
-  const session = options.authenticated ? getAuthSession() : null;
+  const storedSession = getAuthSession();
+  const session = options.authenticated ? storedSession : null;
   if (options.authenticated && !session) {
     throw new ApiError('Sign in to access your learner data.', 401, {
       code: 'AUTH_REQUIRED',
@@ -250,14 +251,18 @@ async function requestJson<T>(url: string, init: RequestInit = {}, options: Requ
     });
   }
 
-  const requestInit = session ? withBearerAuth(init, session) : init;
+  const isGuest = storedSession?.access_token === 'guest-offline-token';
+  const authSessionToAttach = session || (!options.authenticated && storedSession && !isGuest ? storedSession : null);
+  const requestInit = authSessionToAttach ? withBearerAuth(init, authSessionToAttach) : (session ? withBearerAuth(init, session) : init);
 
   try {
     const response = await fetch(url, requestInit);
     const payload = await readResponseBody(response);
 
     if (!response.ok) {
-      if (response.status === 401) clearAuthSession();
+      if (response.status === 401 && options.authenticated && !isGuest) {
+        clearAuthSession();
+      }
       throw new ApiError(
         readErrorMessage(payload, `EnginX API request failed with HTTP ${response.status}.`),
         response.status,

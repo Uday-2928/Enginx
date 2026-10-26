@@ -567,9 +567,9 @@ export const module03Lessons: TutorialLesson[] = [
       {
         title: 'Parameterize a width-generic reset',
         brief:
-          'Inside a module with `parameter WIDTH = 8` and a clocked block resetting a reg [WIDTH-1:0] q, write the reset assignment so it stays correct for any WIDTH, and explain why 8\'h00 would be a bug.',
+          'Inside a module with `parameter WIDTH = 8` and a clocked block resetting a reg [WIDTH-1:0] q, write the reset assignment so it stays correct for any WIDTH, and explain why 8\'h00 would be a hazard habit.',
         expectedBehavior:
-          'q <= {WIDTH{1\'b0}}; — replication builds exactly WIDTH zero bits. Hardcoded 8\'h00 works only at WIDTH=8; at WIDTH=12 it would truncate to the low 8 bits, leaving q[11:8]... actually it pads: 12-bit LHS zero-extends the 8-bit literal to 12\'h000 — accidentally still zero, but at WIDTH=4 it truncates to 4\'h0 (still zero by luck). The real hazard is with nonzero constants (e.g. a preset value), so the habit is width-generic literals everywhere.',
+          'q <= {WIDTH{1\'b0}}; — replication builds exactly WIDTH zero bits. Hardcoding 8\'h00 happens to stay zero after truncation/padding for a ZERO value, but the same habit applied to a NONZERO preset (e.g. 8\'h0F at WIDTH=12 truncates the intent; at WIDTH=4 it becomes 4\'hF... while the spec meant 0F of 8 bits) silently corrupts values. The rule: width-generic literals everywhere, so no override can change meaning.',
         hints: [
           'Replication {N{pattern}} scales with parameters.',
           'Ask what happens to a NONZERO width-hardcoded constant at other widths.',

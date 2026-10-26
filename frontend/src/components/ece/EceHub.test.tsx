@@ -54,7 +54,7 @@ describe('ECE Engineering Hub', () => {
     const onCompleteLesson = vi.fn<(lessonId: string) => Promise<void>>().mockResolvedValue(undefined);
     renderHub(undefined, onCompleteLesson);
 
-    expect(screen.getByRole('heading', { name: /good to see you, ece/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /ece's ece workspace/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /your verified learning statistics/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /^learning roadmaps/i }));
@@ -62,9 +62,9 @@ describe('ECE Engineering Hub', () => {
     expect(screen.getAllByText('VLSI design engineer').length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /from truth tables to rtl/i })).toBeInTheDocument();
     expect(screen.getByText(/translate a boolean requirement/i)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /save lesson complete/i }));
+    await user.click(screen.getByRole('button', { name: /mark complete/i }));
     expect(onCompleteLesson).toHaveBeenCalledWith('lesson-content-verilog-digital-logic');
-    expect(screen.getByText(/locked stages explain their prerequisite/i)).toBeInTheDocument();
+    expect(screen.getByText(/locked stages list the prerequisite/i)).toBeInTheDocument();
   });
 
   it('calculates a unit-aware RC time constant and persists preference edits', async () => {
@@ -92,7 +92,7 @@ describe('ECE Engineering Hub', () => {
     await user.click(screen.getByRole('button', { name: /^hardware fundamentals/i }));
     expect(screen.getByRole('heading', { name: /from electrical signals to logic gates/i })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /and gate: all conditions must be true/i }));
-    await user.click(screen.getByRole('button', { name: /save lesson complete/i }));
+    await user.click(screen.getByRole('button', { name: /mark complete/i }));
     expect(onCompleteLesson).toHaveBeenCalledWith('lesson-content-fundamentals-and-gate');
   });
 

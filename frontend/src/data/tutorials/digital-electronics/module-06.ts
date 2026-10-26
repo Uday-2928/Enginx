@@ -821,7 +821,7 @@ export const module06Lessons: TutorialLesson[] = [
           'Write each intermediate 4-bit pattern as a decimal value to see which decoders misfire.',
           'Count stages toggled: that equals the settle delays.',
         ],
-        },
+      },
     ],
     assessment: {
       title: 'Counters checkpoint',

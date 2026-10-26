@@ -10,6 +10,7 @@ import { Leaderboard } from './components/dashboard/Leaderboard';
 import { OnboardingModal } from './components/onboarding/OnboardingModal';
 import { CyberHub } from './components/cybersecurity/CyberHub';
 import { EceHub } from './components/ece/EceHub';
+import { DomainsPage } from './components/domains/DomainsPage';
 import type { OnboardingFormValues } from './components/onboarding/OnboardingModal';
 import type {
   Badge,
@@ -20,6 +21,7 @@ import type {
   CybersecurityCTFChallenge,
   CybersecurityLab,
   CybersecurityProgress,
+  CybersecurityStats,
   Discipline,
   EcePreferences,
   LeaderboardEntry,
@@ -57,8 +59,11 @@ import {
   updateUserProfile,
 } from './services/api';
 
-type AppTab = 'ece-hub' | 'cyber-hub' | 'challenges' | 'skill-tree' | 'badges' | 'leaderboard';
+type AppTab = 'ece-hub' | 'cyber-hub' | 'domains' | 'challenges' | 'skill-tree' | 'badges' | 'leaderboard';
 type EvaluationAction = 'run' | 'submit';
+
+const VALID_TABS: AppTab[] = ['ece-hub', 'cyber-hub', 'domains', 'challenges', 'skill-tree', 'badges', 'leaderboard'];
+const ACTIVE_TAB_STORAGE_KEY = 'enginx.active.tab';
 
 function errorMessage(error: unknown, fallback: string): string {
   if (error instanceof ApiError) return error.message;
@@ -148,10 +153,25 @@ function isCyberLearner(user: Pick<User, 'primary_role' | 'branch'> | null | und
 export function App() {
   const [session, setSession] = useState<AuthSession | null>(() => getAuthSession());
   const [currentTab, setCurrentTab] = useState<AppTab>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY) as AppTab | null;
+        if (saved && VALID_TABS.includes(saved)) return saved;
+      } catch {}
+    }
     const user = getAuthSession()?.user;
     if (isCyberLearner(user)) return 'cyber-hub';
     return isEceLearner(user) ? 'ece-hub' : 'challenges';
   });
+
+  const handleTabChange = useCallback((tab: AppTab) => {
+    setCurrentTab(tab);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(ACTIVE_TAB_STORAGE_KEY, tab);
+      } catch {}
+    }
+  }, []);
   const [catalogueChallenges, setCatalogueChallenges] = useState<Challenge[]>(INITIAL_CHALLENGES);
   const [selectedDiscipline, setSelectedDiscipline] = useState<ChallengeFilter>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -175,6 +195,9 @@ export function App() {
   });
 
   useEffect(() => {
+    // Bank challenges live outside the classic branch-filtered catalogue, so a
+    // bank selection must survive catalogue updates instead of resetting.
+    if (selectedChallenge.id.startsWith('bank-')) return;
     if (challenges.length > 0 && !challenges.some((c) => c.id === selectedChallenge.id)) {
       setSelectedChallenge(challenges[0]);
     }
@@ -249,15 +272,15 @@ export function App() {
     }
 
     if (normalized !== 'ECE' && currentTab === 'ece-hub') {
-      setCurrentTab('challenges');
+      handleTabChange('challenges');
     }
-    if (['CYBER', 'CYBERSECURITY'].includes(normalized) && currentTab !== 'cyber-hub') {
-      setCurrentTab('cyber-hub');
+    if (normalized === 'CYBER' && currentTab !== 'cyber-hub') {
+      handleTabChange('cyber-hub');
     }
-    if (normalized !== 'CYBER' && normalized !== 'CYBERSECURITY' && currentTab === 'cyber-hub') {
-      setCurrentTab('challenges');
+    if (normalized !== 'CYBER' && currentTab === 'cyber-hub') {
+      handleTabChange('challenges');
     }
-  }, [currentTab, session, user]);
+  }, [currentTab, handleTabChange, session, user]);
 
   const loadLearningState = useCallback(async () => {
     setIsLoadingLearningState(true);
@@ -410,7 +433,9 @@ export function App() {
     fetchChallenges('all')
       .then((data) => {
         if (!active) return;
-        setCatalogueChallenges(data);
+        // The HDL coding bank has its own browser inside the ECE hub; keep
+        // bank records out of the classic challenge workspace.
+        setCatalogueChallenges(data.filter((challenge) => !challenge.id.startsWith('bank-')));
       })
       .catch((error) => {
         if (active) setChallengeError(errorMessage(error, 'Challenges could not be loaded.'));
@@ -537,7 +562,23 @@ export function App() {
   const handleAuthenticated = (nextSession: AuthSession) => {
     setSession(nextSession);
     applyUser(nextSession.user);
-    if (isEceLearner(nextSession.user)) setCurrentTab('ece-hub');
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.localStorage.getItem(ACTIVE_TAB_STORAGE_KEY) as AppTab | null;
+        if (saved && VALID_TABS.includes(saved)) {
+          handleTabChange(saved);
+          setLearningStateError(null);
+          return;
+        }
+      } catch {}
+    }
+    if (isCyberLearner(nextSession.user)) {
+      handleTabChange('cyber-hub');
+    } else if (isEceLearner(nextSession.user)) {
+      handleTabChange('ece-hub');
+    } else {
+      handleTabChange('challenges');
+    }
     setLearningStateError(null);
   };
 
@@ -559,6 +600,11 @@ export function App() {
 
   const handleSignOut = () => {
     clearAuthSession();
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(ACTIVE_TAB_STORAGE_KEY);
+      } catch {}
+    }
     setSession(null);
     setUser(null);
     setProgress(null);
@@ -584,7 +630,7 @@ export function App() {
       {/* Platform Header */}
       <Header
         currentTab={currentTab}
-        setCurrentTab={setCurrentTab}
+        setCurrentTab={handleTabChange}
         userXp={user?.xp ?? null}
         streakDays={user?.streak_days ?? null}
         onOpenOnboarding={() => setIsOnboardingOpen(true)}
@@ -613,9 +659,9 @@ export function App() {
               <button
                 type="button"
                 onClick={() => void loadLearningState()}
-                className="focus-ring min-h-[36px] rounded-lg border border-amber-300 bg-white px-3 font-bold text-amber-900 hover:bg-amber-100"
+                className="focus-ring btn-secondary"
               >
-                Retry saved data
+                Retry
               </button>
             </div>
           )}
@@ -635,7 +681,7 @@ export function App() {
               challenges={catalogueChallenges}
               onOpenChallenge={(challenge) => {
                 setSelectedChallenge(challenge);
-                setCurrentTab('challenges');
+                handleTabChange('challenges');
               }}
               onOpenProfile={() => setIsOnboardingOpen(true)}
               onSavePreferences={handleSaveEcePreferences}
@@ -660,6 +706,14 @@ export function App() {
               onOpenCTF={handleOpenCyberCTF}
             />
           </div>
+        )}
+        {currentTab === 'domains' && (
+          <DomainsPage
+            completedLessonIds={completedLessonIds}
+            onCompleteLesson={handleCompleteLesson}
+            onOpenEceHub={() => handleTabChange('ece-hub')}
+            onOpenCyberHub={() => handleTabChange('cyber-hub')}
+          />
         )}
         {currentTab === 'challenges' && (
           <div className="mx-auto grid w-full max-w-[1720px] flex-1 grid-cols-1 gap-4 px-4 py-4 sm:px-6 lg:h-[calc(100vh-7.5rem)] lg:grid-cols-[minmax(250px,0.82fr)_minmax(320px,1.12fr)_minmax(360px,1.45fr)] lg:gap-5 lg:px-8 lg:py-5">
@@ -719,7 +773,7 @@ export function App() {
               completedIds={completedIds}
               onSelectChallenge={(c) => {
                 setSelectedChallenge(c);
-                setCurrentTab('challenges');
+                handleTabChange('challenges');
               }}
               selectedDiscipline={selectedDiscipline}
               setSelectedDiscipline={setSelectedDiscipline}

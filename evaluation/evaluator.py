@@ -73,6 +73,12 @@ def _evaluate_request(req: EvaluateRequest):
 
     if lang in ["verilog", "v"]:
         runner = VerilogRunner(timeout_seconds=timeout_sec, memory_limit_mb=mem_mb)
+    elif lang in ["systemverilog", "sv"]:
+        # Icarus Verilog compiles a SystemVerilog subset under -g2012. The
+        # result is whatever the installed toolchain actually reports — the
+        # runner never fakes a passing simulation.
+        runner = VerilogRunner(timeout_seconds=timeout_sec, memory_limit_mb=mem_mb,
+                               iverilog_flags=["-g2012"])
     elif lang in ["c", "cpp"]:
         runner = CRunner(timeout_seconds=timeout_sec, memory_limit_mb=mem_mb)
     elif lang in ["python", "py"]:

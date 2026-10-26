@@ -156,12 +156,12 @@ export const TutorialMarkdown: React.FC<{ content: string }> = ({ content }) => 
         switch (block.kind) {
           case 'heading':
             if (block.level === 1) {
-              return <h2 key={key} className="pt-2 text-xl font-extrabold text-slate-900">{renderInline(block.text, key)}</h2>;
+              return <h2 key={key} className="pt-2 text-lg font-semibold text-slate-900">{renderInline(block.text, key)}</h2>;
             }
             if (block.level === 2) {
-              return <h3 key={key} className="pt-2 text-lg font-extrabold text-slate-900">{renderInline(block.text, key)}</h3>;
+              return <h3 key={key} className="pt-2 text-base font-semibold text-slate-900">{renderInline(block.text, key)}</h3>;
             }
-            return <h4 key={key} className="pt-1 text-base font-bold text-slate-900">{renderInline(block.text, key)}</h4>;
+            return <h4 key={key} className="pt-1 text-sm font-semibold text-slate-900">{renderInline(block.text, key)}</h4>;
           case 'paragraph':
             return <p key={key}>{renderInline(block.text, key)}</p>;
           case 'bullets':

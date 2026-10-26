@@ -80,3 +80,22 @@ def get_current_user(
     if not user:
         raise _unauthorized()
     return user
+
+
+def get_optional_current_user(
+    token: Optional[str] = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        subject = payload.get("sub")
+        if not isinstance(subject, str) or not subject:
+            return None
+    except (JWTError, ValueError):
+        return None
+
+    return db.query(User).filter(User.id == subject).first()
+

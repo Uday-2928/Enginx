@@ -4,6 +4,7 @@ export type EceHubSection =
   | 'dashboard'
   | 'roadmaps'
   | 'tutorials'
+  | 'coding-tracks'
   | 'fundamentals'
   | 'vlsi'
   | 'embedded'
@@ -50,9 +51,10 @@ export interface EceNavItem {
 }
 
 export const ECE_NAV_ITEMS: EceNavItem[] = [
-  { id: 'dashboard', label: 'ECE Dashboard', group: 'workspace', icon: 'dashboard', description: 'Your next lesson, challenge and verified progress.' },
+  { id: 'dashboard', label: 'ECE dashboard', group: 'workspace', icon: 'dashboard', description: 'Your next lesson, challenge and verified progress.' },
   { id: 'roadmaps', label: 'Learning roadmaps', group: 'workspace', icon: 'roadmap', description: 'Dependency-aware learning paths.' },
   { id: 'tutorials', label: 'Engineering Tutorials', group: 'workspace', icon: 'graduation', description: 'Assessment-gated course lessons with durable completion.' },
+  { id: 'coding-tracks', label: 'Coding tracks', group: 'workspace', icon: 'code', description: 'Verilog, SystemVerilog and RTL practice bank.' },
   { id: 'fundamentals', label: 'Hardware fundamentals', group: 'workspace', icon: 'logic', description: 'Electrical basics, digital signals, binary and logic gates.' },
   { id: 'vlsi', label: 'VLSI engineering', group: 'disciplines', icon: 'chip', description: 'RTL, verification, timing and physical design.' },
   { id: 'embedded', label: 'Embedded systems', group: 'disciplines', icon: 'cpu', description: 'C, peripherals, protocols and real-time systems.' },
@@ -77,7 +79,7 @@ export const ECE_NAV_ITEMS: EceNavItem[] = [
   { id: 'playground', label: 'Logic gate playground', group: 'practice', icon: 'logic', description: 'Simulate supported two-state gates and a half adder.' },
   { id: 'calculations', label: 'Engineering calculations', group: 'practice', icon: 'calculator', description: 'Unit-aware calculators with explicit assumptions.' },
   { id: 'labs', label: 'Projects & virtual labs', group: 'practice', icon: 'lab', description: 'Guided experiments with honest limitations.' },
-  { id: 'virtual-lab', label: 'Virtual Hardware Lab', group: 'practice', icon: 'hardware-lab', description: 'Build circuits, connect pins and run a supported hardware simulation.' },
+  { id: 'virtual-lab', label: 'Virtual hardware lab', group: 'practice', icon: 'hardware-lab', description: 'Build circuits, connect pins and run a supported hardware simulation.' },
   { id: 'challenges', label: 'Practice challenges', group: 'practice', icon: 'code', description: 'Open the real evaluated challenge workspace.' },
   { id: 'assessments', label: 'Assessments & exams', group: 'practice', icon: 'assessment', description: 'Revision queues and measurable checks.' },
   { id: 'contests', label: 'Contests & leaderboards', group: 'practice', icon: 'trophy', description: 'Verified results only; no invented rankings.' },
@@ -108,12 +110,12 @@ export interface EceSubject {
 
 export const ECE_SUBJECTS: EceSubject[] = [
   {
-    id: 'hardware-fundamentals', section: 'fundamentals', title: 'Hardware fundamentals and logic gates', eyebrow: 'Start here',
+    id: 'hardware-fundamentals', section: 'fundamentals', title: 'Hardware fundamentals and logic gates', eyebrow: 'Foundations',
     description: 'Move from safe low-voltage electrical vocabulary through digital thresholds, binary representation, logic gates and a verified half-adder model.', level: 'Foundation', lessons: 11, estimatedHours: 8,
     prerequisites: [], challengeIds: ['ece-04-half-adder'], nextSkill: 'Verilog gate primitives', toolStatus: 'available',
   },
   {
-    id: 'digital-foundations', section: 'digital', title: 'Digital electronics foundations', eyebrow: 'Start here',
+    id: 'digital-foundations', section: 'digital', title: 'Digital electronics foundations', eyebrow: 'Foundations',
     description: 'Move from truth tables and Boolean algebra to timing-aware sequential logic.', level: 'Foundation', lessons: 8, estimatedHours: 6,
     prerequisites: ['Binary arithmetic'], challengeIds: ['ece-01-ripple-carry-adder', 'ece-02-d-flip-flop'], nextSkill: 'Verilog RTL', toolStatus: 'available',
   },
@@ -133,7 +135,7 @@ export const ECE_SUBJECTS: EceSubject[] = [
     prerequisites: ['Synthesizable Verilog HDL'], challengeIds: [], nextSkill: 'SystemVerilog assertions', toolStatus: 'partial',
   },
   {
-    id: 'vlsi-foundations', section: 'vlsi', title: 'VLSI design foundations', eyebrow: 'Silicon path',
+    id: 'vlsi-foundations', section: 'vlsi', title: 'VLSI design foundations', eyebrow: 'Device to layout',
     description: 'Connect logic, CMOS devices, power, timing and the RTL-to-layout flow.', level: 'Intermediate', lessons: 14, estimatedHours: 14,
     prerequisites: ['Digital electronics foundations', 'Semiconductor devices'], challengeIds: [], nextSkill: 'Timing and synthesis', toolStatus: 'partial',
   },
@@ -168,7 +170,7 @@ export const ECE_SUBJECTS: EceSubject[] = [
     prerequisites: ['Signals and systems'], challengeIds: [], nextSkill: 'Instrumentation', toolStatus: 'available',
   },
   {
-    id: 'pcb-foundations', section: 'pcb', title: 'PCB design foundations', eyebrow: 'Build hardware',
+    id: 'pcb-foundations', section: 'pcb', title: 'PCB design foundations', eyebrow: 'Hardware build',
     description: 'Move from a checked schematic through placement, routing, power integrity and fabrication outputs.', level: 'Foundation', lessons: 8, estimatedHours: 8,
     prerequisites: ['Circuit analysis'], challengeIds: [], nextSkill: 'Hardware debugging', toolStatus: 'partial',
   },
@@ -178,7 +180,7 @@ export const ECE_SUBJECTS: EceSubject[] = [
     prerequisites: ['Electronics fundamentals'], challengeIds: [], nextSkill: 'CMOS logic and VLSI', toolStatus: 'available',
   },
   {
-    id: 'instrumentation', section: 'instrumentation', title: 'Instrumentation & sensors', eyebrow: 'Measure reality',
+    id: 'instrumentation', section: 'instrumentation', title: 'Instrumentation & sensors', eyebrow: 'Measurement',
     description: 'Select sensors, condition signals, quantify error and design repeatable acquisition steps.', level: 'Intermediate', lessons: 9, estimatedHours: 9,
     prerequisites: ['Analog electronics'], challengeIds: [], nextSkill: 'IoT telemetry', toolStatus: 'partial',
   },
